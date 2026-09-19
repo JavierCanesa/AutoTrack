@@ -1,0 +1,9 @@
+{
+  "name": "autotrack",
+  "private": true,
+  "workspaces": ["Frontend"],
+  "scripts": {
+    "dev": "npm run dev --workspace=Frontend",
+    "build": "npm run build --workspace=Frontend"
+  }
+}
