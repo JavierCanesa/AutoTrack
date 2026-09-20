@@ -154,3 +154,28 @@ No necesitas crear `.venv` ni instalar todo nuevamente.
 | Respuesta `503` | Revisa las variables de Backend/.env. |
 | Respuesta `502` | Revisa conexión, clave, tabla y permisos en Supabase. |
 | Respuesta `[]` | Puede no haber datos o RLS no permite verlos; no desactives RLS. |
+
+## Iniciar sesión
+
+Usa una cuenta existente de Supabase Authentication y su contraseña. Debe tener un perfil en `public.profiles` con rol ADMIN, MECHANIC o CLIENT.
+RLS debe permitir al usuario autenticado leer su propio perfil. No se modifican políticas desde el backend.
+
+En Postman: `POST http://127.0.0.1:8000/api/auth/login`, Body > raw > JSON:
+
+```json
+{
+  "email": "cliente2@autotrack.test",
+  "password": "TU_CONTRASENA"
+}
+```
+
+La respuesta incluye `access_token`, `expires_in` y `user`. No compartas el token ni guardes contraseñas reales en archivos del repositorio.
+
+Para comprobar la sesión: `GET http://127.0.0.1:8000/api/auth/me`. En Authorization, selecciona Bearer Token y pega el `access_token` recibido.
+
+- 401: credenciales incorrectas, cuenta sin confirmar o sesión inválida.
+- 403: falta un perfil visible o su rol no es válido.
+- 429: demasiados intentos; espera antes de repetir.
+- 502/503: problema de conexión, configuración o permisos del perfil.
+
+La sesión del frontend se mantiene solo en memoria y se descarta al recargar, al vencer o al pulsar Cerrar sesión. No hay renovación automática ni registro implementado en esta etapa.
