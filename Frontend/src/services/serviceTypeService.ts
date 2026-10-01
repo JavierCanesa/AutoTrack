@@ -1,3 +1,9 @@
+import { authenticatedFetch, readResponse } from './authService';
+
+export async function getWorkshopServiceTypes(): Promise<ServiceType[]> {
+  return readResponse<ServiceType[]>(await authenticatedFetch('/api/service-types/workshop'));
+}
+
 export interface ServiceType {
   id: string;
   name: string;

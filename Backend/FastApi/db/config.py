@@ -8,6 +8,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     supabase_url: HttpUrl
     supabase_key: SecretStr
+    supabase_secret_key: SecretStr | None = None
+    cookie_secure: bool = False
+    evidence_bucket: str = "evidence"
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[2] / ".env",

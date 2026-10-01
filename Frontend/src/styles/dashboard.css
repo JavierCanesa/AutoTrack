@@ -1,66 +1,878 @@
-.workspace { min-height: 100vh; background: #f4f6fa; color: #1e293b; font-size: 14px; }
-.workspace button { margin: 0; font: inherit; }
-.workspace input, .workspace select, .workspace textarea { font: inherit; color: #334155; background: white; border: 1px solid #d8e0ea; border-radius: 8px; padding: 11px 13px; }
-.workspace input:focus, .workspace select:focus, .workspace textarea:focus { outline: 2px solid #ea580c; outline-offset: 2px; }
-.ws-sidebar { width: 240px; position: fixed; inset: 0 auto 0 0; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 20; }
-.ws-logo { display: flex; align-items: center; gap: 12px; color: white; font-weight: 750; font-size: 23px; padding: 24px; height: 82px; background: linear-gradient(115deg, #1e293b, #8a4429 75%, #c64c0b); }
-.ws-logo span { border: 1px solid #ffffff70; border-radius: 8px; padding: 6px; font-size: 13px; }
-.ws-nav-caption { font-size: 10px; letter-spacing: 1.3px; color: #64748b; margin: 30px 22px 14px; font-weight: 700; }
-.ws-sidebar nav { display: grid; gap: 8px; padding: 0 12px; }
-.ws-sidebar nav button { text-align: left; display: flex; align-items: center; gap: 14px; padding: 13px; border-radius: 8px; background: transparent; color: #475569; font-size: 13px; }
-.ws-sidebar nav button:hover { background: #f1f5f9; }
-.ws-sidebar nav button.ws-nav-active { background: linear-gradient(110deg, #1e293b, #bb4c17); color: white; box-shadow: 0 4px 10px #ea580c20; }
-.ws-sidebar-bottom { margin-top: auto; padding: 20px; border-top: 1px solid #e2e8f0; }
-.ws-person { display: flex; align-items: center; gap: 10px; }
-.ws-person strong { display: block; font-size: 12px; overflow-wrap: anywhere; }
-.ws-person small { display: block; color: #64748b; margin-top: 5px; font-size: 11px; }
-.ws-avatar { display: inline-grid; place-items: center; min-width: 38px; height: 38px; border-radius: 50%; color: #9a3412; background: #ffedd5; font-weight: 700; }
-.ws-sidebar .ws-logout { background: transparent; color: #64748b; padding: 18px 0 0; font-size: 12px; }
-.ws-body { margin-left: 240px; }
-.ws-header { height: 82px; padding: 0 34px; border-bottom: 1px solid #e2e8f0; background: #ffffffdd; color: #64748b; font-size: 12px; }
-.ws-header > div { display: flex; align-items: center; gap: 12px; }
-.ws-separator { padding: 0 12px; color: #94a3b8; }
-.ws-role { padding: 7px 12px; background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; border-radius: 20px; }
-.ws-main { max-width: 1500px; padding: 28px 34px; }
-.ws-demo { display: flex; align-items: center; gap: 10px; padding: 11px 15px; background: #fff8ee; border: 1px solid #f3dbb9; border-radius: 8px; color: #895126; font-size: 11px; line-height: 1.7; }
-.ws-title { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin: 30px 0 26px; }
-.ws-overline { font-size: 10px; color: #b34309; font-weight: 750; letter-spacing: 1.5px; }
-.ws-title h1 { font-size: clamp(25px, 3vw, 34px); letter-spacing: -1px; margin: 6px 0; }
-.ws-title p:last-child { color: #64748b; margin-bottom: 0; }
-.ws-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 18px; margin-bottom: 26px; }
-.ws-stat { border: 1px solid #e2e8f0; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px #1e293b03; }
-.ws-stat > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #64748b; font-size: 12px; }
-.ws-stat > strong { display: block; font-size: 32px; margin: 10px 0; }
-.ws-stat small { color: #64748b; font-size: 11px; }
-.ws-stat-icon { width: 32px; height: 32px; display: grid; place-items: center; background: #fff0e6; border-radius: 8px; color: #c2410c; font-size: 18px; }
-.ws-icon-1 { background: #fef3c7; color: #92400e; }.ws-icon-2 { background: #dbeafe; color: #1d4ed8; }.ws-icon-3 { background: #d1fae5; color: #047857; }
-.ws-panel { padding: 24px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; }
-.ws-panel h2 { font-size: 17px; margin: 0 0 12px; }.ws-panel h3 { font-size: 14px; margin-top: 26px; }
-.ws-panel p { color: #64748b; font-size: 13px; }
-.ws-panel-title { display: flex; justify-content: space-between; align-items: center; }.ws-panel-title p { margin-top: 0; font-size: 12px; }
-.ws-filters { display: flex; gap: 12px; margin: 12px 0 22px; }.ws-filters label:first-child { flex: 1; }.ws-filters input { width: 100%; }
-.ws-table-wrap { overflow-x: auto; }
-.workspace table { border-collapse: collapse; width: 100%; text-align: left; white-space: nowrap; }
-.workspace th { font-size: 10px; text-transform: uppercase; letter-spacing: .6px; color: #64748b; background: #f8fafc; padding: 14px 12px; font-weight: 650; }
-.workspace td { padding: 18px 12px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }.workspace td strong { font-weight: 600; }.workspace td small { display: block; color: #64748b; font-size: 10px; margin-top: 6px; }
-.ws-badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 20px; background: #f1f5f9; padding: 6px 9px; color: #475569; font-size: 10px; font-weight: 650; white-space: nowrap; }
-.ws-diagnosis, .ws-waiting_approval { background: #fef3c7; color: #92400e; }.ws-in_repair, .ws-testing { background: #dbeafe; color: #1e40af; }.ws-completed { background: #d1fae5; color: #065f46; }.ws-cancelled { background: #fee2e2; color: #991b1b; }
-.workspace .ws-text-button { background: transparent; color: #b34309; font-size: 11px; padding: 9px 0; }
-.workspace .ws-primary { background: #c64709; padding: 12px 16px; font-weight: 600; font-size: 12px; }.workspace .ws-secondary { background: white; border: 1px solid #d8e0ea; color: #475569; padding: 10px 16px; font-size: 12px; }
-.ws-summary, .ws-detail-grid, .ws-mechanics { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 24px; }
-.ws-workload { margin-top: 22px; }.ws-workload > div { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; margin-bottom: 10px; }.ws-workload strong { color: #64748b; font-weight: 500; }.ws-workload progress { width: 100%; height: 9px; accent-color: #ea580c; }
-.ws-activity { padding: 8px 0 8px 14px; border-left: 2px solid #fed7aa; }.ws-activity strong { color: #334155; }
-.ws-footer { color: #94a3b8; text-align: center; padding: 28px 0 6px; font-size: 11px; }
-.ws-detail-heading { display: flex; gap: 20px; align-items: center; color: #64748b; font-size: 12px; }
-.workspace dl { display: grid; gap: 16px; margin: 24px 0; }.workspace dl > div { display: flex; justify-content: space-between; gap: 16px; }.workspace dt { color: #64748b; }.workspace dd { margin: 0; text-align: right; font-weight: 550; }
-.ws-timeline { padding: 0; list-style: none; }.ws-timeline li { border: 0; border-left: 2px solid #fed7aa; border-radius: 0; padding: 10px 0 24px 20px; font-size: 12px; position: relative; }.ws-timeline li > span { position: absolute; left: -5px; top: 15px; background: #ea580c; width: 8px; height: 8px; border-radius: 50%; }
-.ws-empty-small { padding: 24px; border: 1px dashed #cbd5e1; border-radius: 8px; color: #64748b; text-align: center; font-size: 12px; }
-.ws-part { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
-.ws-progress { margin-top: 24px; }.ws-progress label { display: block; margin: 18px 0; font-size: 13px; }.ws-progress select, .ws-progress textarea { display: block; margin-top: 8px; width: 100%; }.ws-progress textarea { resize: vertical; }
-.ws-mechanics h2 { margin-top: 16px; }.workspace .ws-job-link { display: flex; width: 100%; justify-content: space-between; text-align: left; background: transparent; color: #334155; padding: 14px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }.ws-job-link small { display: block; color: #64748b; margin-top: 5px; }
-.ws-vehicles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }.ws-vehicle { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; padding: 20px; }.ws-car { display: grid; place-items: center; height: 90px; color: #9a3412; background: linear-gradient(130deg, #f1f5f9, #fff7ed); font-size: 60px; border-radius: 8px; }.ws-vehicle-title h3 { margin-bottom: 6px; }.ws-vehicle-title > span { display: block; color: #64748b; margin-bottom: 16px; font-size: 12px; }.ws-vehicle .ws-primary { width: 100%; margin-top: 10px; }
-.ws-empty { text-align: center; padding: 40px 12px; }.ws-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.workspace .ws-menu { display: none; background: transparent; color: #334155; padding: 8px; }
-@media(max-width: 1050px) { .ws-sidebar { width: 210px; }.ws-body { margin-left: 210px; }.ws-main { padding: 22px; }.ws-stats { grid-template-columns: repeat(2, 1fr); }.ws-header { padding: 0 22px; } }
-@media(max-width: 720px) { .ws-sidebar { display: none; top: 66px; width: min(280px, 90vw); box-shadow: 8px 0 30px #1e293b20; }.ws-sidebar.ws-open { display: flex; }.ws-body { margin-left: 0; }.ws-header { height: 66px; position: sticky; top: 0; z-index: 10; background: white; padding: 0 14px; }.workspace .ws-menu { display: inline-block; }.ws-main { padding: 16px; }.ws-summary, .ws-detail-grid, .ws-mechanics { grid-template-columns: 1fr; }.ws-filters { flex-direction: column; }.ws-filters select { width: 100%; }.ws-title { align-items: flex-start; }.ws-title h1 { font-size: 25px; }.ws-stats { gap: 10px; }.ws-stat { padding: 15px; }.ws-stat > div { font-size: 11px; }.ws-panel { padding: 16px; }.ws-demo { font-size: 10px; }.ws-vehicles { grid-template-columns: 1fr; } }
-@media(max-width: 360px) { .ws-stats { grid-template-columns: 1fr; }.ws-role { display: none; } }
+.workspace {
+  min-height: 100vh;
+  background: #f4f6fa;
+  color: #1e293b;
+  font-size: 14px;
+}
+.workspace button {
+  margin: 0;
+  font: inherit;
+}
+.workspace input,
+.workspace select,
+.workspace textarea {
+  font: inherit;
+  color: #334155;
+  background: white;
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  padding: 11px 13px;
+}
+.workspace input:focus,
+.workspace select:focus,
+.workspace textarea:focus {
+  outline: 2px solid #ea580c;
+  outline-offset: 2px;
+}
+.ws-sidebar {
+  width: 240px;
+  position: fixed;
+  inset: 0 auto 0 0;
+  background: #fff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+.ws-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  font-weight: 750;
+  font-size: 23px;
+  padding: 24px;
+  height: 82px;
+  background: linear-gradient(115deg, #1e293b, #8a4429 75%, #c64c0b);
+}
+.ws-logo img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.ws-nav-caption {
+  font-size: 10px;
+  letter-spacing: 1.3px;
+  color: #64748b;
+  margin: 30px 22px 14px;
+  font-weight: 700;
+}
+.ws-sidebar nav {
+  display: grid;
+  gap: 8px;
+  padding: 0 12px;
+}
+.ws-sidebar nav button {
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  font-size: 13px;
+}
+.ws-sidebar nav button:hover {
+  background: #f1f5f9;
+}
+.ws-sidebar nav button.ws-nav-active {
+  background: linear-gradient(110deg, #1e293b, #bb4c17);
+  color: white;
+  box-shadow: 0 4px 10px #ea580c20;
+}
+.ws-sidebar-bottom {
+  margin-top: auto;
+  padding: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+.ws-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ws-person strong {
+  display: block;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.ws-person small {
+  display: block;
+  color: #64748b;
+  margin-top: 5px;
+  font-size: 11px;
+}
+.ws-avatar {
+  display: inline-grid;
+  place-items: center;
+  min-width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: #9a3412;
+  background: #ffedd5;
+  font-weight: 700;
+}
+.ws-sidebar .ws-logout {
+  background: transparent;
+  color: #64748b;
+  padding: 18px 0 0;
+  font-size: 12px;
+}
+.ws-body {
+  margin-left: 240px;
+}
+.ws-header {
+  height: 82px;
+  padding: 0 34px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffffdd;
+  color: #64748b;
+  font-size: 12px;
+}
+.ws-header > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ws-separator {
+  padding: 0 12px;
+  color: #94a3b8;
+}
+.ws-role {
+  padding: 7px 12px;
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  border-radius: 20px;
+}
+.ws-main {
+  max-width: 1500px;
+  padding: 28px 34px;
+}
+.ws-demo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 15px;
+  background: #fff8ee;
+  border: 1px solid #f3dbb9;
+  border-radius: 8px;
+  color: #895126;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.ws-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  margin: 30px 0 26px;
+}
+.ws-overline {
+  font-size: 10px;
+  color: #b34309;
+  font-weight: 750;
+  letter-spacing: 1.5px;
+}
+.ws-title h1 {
+  font-size: clamp(25px, 3vw, 34px);
+  letter-spacing: -1px;
+  margin: 6px 0;
+}
+.ws-title p:last-child {
+  color: #64748b;
+  margin-bottom: 0;
+}
+.ws-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 18px;
+  margin-bottom: 26px;
+}
+.ws-stat {
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 5px #1e293b03;
+}
+.ws-stat > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #64748b;
+  font-size: 12px;
+}
+.ws-stat > strong {
+  display: block;
+  font-size: 32px;
+  margin: 10px 0;
+}
+.ws-stat small {
+  color: #64748b;
+  font-size: 11px;
+}
+.ws-stat-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  background: #fff0e6;
+  border-radius: 8px;
+  color: #c2410c;
+  font-size: 18px;
+}
+.ws-icon-1 {
+  background: #fef3c7;
+  color: #92400e;
+}
+.ws-icon-2 {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.ws-icon-3 {
+  background: #d1fae5;
+  color: #047857;
+}
+.ws-panel {
+  padding: 24px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+.ws-panel h2 {
+  font-size: 17px;
+  margin: 0 0 12px;
+}
+.ws-panel h3 {
+  font-size: 14px;
+  margin-top: 26px;
+}
+.ws-panel p {
+  color: #64748b;
+  font-size: 13px;
+}
+.ws-panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ws-panel-title p {
+  margin-top: 0;
+  font-size: 12px;
+}
+.ws-filters {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0 22px;
+}
+.ws-filters label:first-child {
+  flex: 1;
+}
+.ws-filters input {
+  width: 100%;
+}
+.ws-table-wrap {
+  overflow-x: auto;
+}
+.workspace table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+}
+.workspace th {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 14px 12px;
+  font-weight: 650;
+}
+.workspace td {
+  padding: 18px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 12px;
+}
+.workspace td strong {
+  font-weight: 600;
+}
+.workspace td small {
+  display: block;
+  color: #64748b;
+  font-size: 10px;
+  margin-top: 6px;
+}
+.ws-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 20px;
+  background: #f1f5f9;
+  padding: 6px 9px;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.ws-diagnosis,
+.ws-waiting_approval {
+  background: #fef3c7;
+  color: #92400e;
+}
+.ws-in_repair,
+.ws-testing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.ws-completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+.ws-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.workspace .ws-text-button {
+  background: transparent;
+  color: #b34309;
+  font-size: 11px;
+  padding: 9px 0;
+}
+.workspace .ws-primary {
+  background: #c64709;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 12px;
+}
+.workspace .ws-secondary {
+  background: white;
+  border: 1px solid #d8e0ea;
+  color: #475569;
+  padding: 10px 16px;
+  font-size: 12px;
+}
+.ws-summary,
+.ws-detail-grid,
+.ws-mechanics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-top: 24px;
+}
+.ws-workload {
+  margin-top: 22px;
+}
+.ws-workload > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.ws-workload strong {
+  color: #64748b;
+  font-weight: 500;
+}
+.ws-workload progress {
+  width: 100%;
+  height: 9px;
+  accent-color: #ea580c;
+}
+.ws-activity {
+  padding: 8px 0 8px 14px;
+  border-left: 2px solid #fed7aa;
+}
+.ws-activity strong {
+  color: #334155;
+}
+.ws-footer {
+  color: #94a3b8;
+  text-align: center;
+  padding: 28px 0 6px;
+  font-size: 11px;
+}
+.ws-detail-heading {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  color: #64748b;
+  font-size: 12px;
+}
+.workspace dl {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0;
+}
+.workspace dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.workspace dt {
+  color: #64748b;
+}
+.workspace dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 550;
+}
+.ws-timeline {
+  padding: 0;
+  list-style: none;
+}
+.ws-timeline li {
+  border: 0;
+  border-left: 2px solid #fed7aa;
+  border-radius: 0;
+  padding: 10px 0 24px 20px;
+  font-size: 12px;
+  position: relative;
+}
+.ws-timeline li > span {
+  position: absolute;
+  left: -5px;
+  top: 15px;
+  background: #ea580c;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.ws-empty-small {
+  padding: 24px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+  text-align: center;
+  font-size: 12px;
+}
+.ws-part {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 12px;
+}
+.ws-progress {
+  margin-top: 24px;
+}
+.ws-progress label {
+  display: block;
+  margin: 18px 0;
+  font-size: 13px;
+}
+.ws-progress select,
+.ws-progress textarea {
+  display: block;
+  margin-top: 8px;
+  width: 100%;
+}
+.ws-progress textarea {
+  resize: vertical;
+}
+.ws-mechanics h2 {
+  margin-top: 16px;
+}
+.workspace .ws-job-link {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  text-align: left;
+  background: transparent;
+  color: #334155;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 12px;
+}
+.ws-job-link small {
+  display: block;
+  color: #64748b;
+  margin-top: 5px;
+}
+.ws-vehicles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+.ws-vehicle {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 20px;
+}
+.ws-car {
+  display: grid;
+  place-items: center;
+  height: 90px;
+  color: #9a3412;
+  background: linear-gradient(130deg, #f1f5f9, #fff7ed);
+  font-size: 60px;
+  border-radius: 8px;
+}
+.ws-vehicle-title h3 {
+  margin-bottom: 6px;
+}
+.ws-vehicle-title > span {
+  display: block;
+  color: #64748b;
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+.ws-vehicle .ws-primary {
+  width: 100%;
+  margin-top: 10px;
+}
+.ws-empty {
+  text-align: center;
+  padding: 40px 12px;
+}
+.ws-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.workspace .ws-menu {
+  display: none;
+  background: transparent;
+  color: #334155;
+  padding: 8px;
+}
+@media (max-width: 1050px) {
+  .ws-sidebar {
+    width: 210px;
+  }
+  .ws-body {
+    margin-left: 210px;
+  }
+  .ws-main {
+    padding: 22px;
+  }
+  .ws-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ws-header {
+    padding: 0 22px;
+  }
+}
+@media (max-width: 720px) {
+  .ws-sidebar {
+    display: none;
+    top: 66px;
+    width: min(280px, 90vw);
+    box-shadow: 8px 0 30px #1e293b20;
+  }
+  .ws-sidebar.ws-open {
+    display: flex;
+  }
+  .ws-body {
+    margin-left: 0;
+  }
+  .ws-header {
+    height: 66px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+    padding: 0 14px;
+  }
+  .workspace .ws-menu {
+    display: inline-block;
+  }
+  .ws-main {
+    padding: 16px;
+  }
+  .ws-summary,
+  .ws-detail-grid,
+  .ws-mechanics {
+    grid-template-columns: 1fr;
+  }
+  .ws-filters {
+    flex-direction: column;
+  }
+  .ws-filters select {
+    width: 100%;
+  }
+  .ws-title {
+    align-items: flex-start;
+  }
+  .ws-title h1 {
+    font-size: 25px;
+  }
+  .ws-stats {
+    gap: 10px;
+  }
+  .ws-stat {
+    padding: 15px;
+  }
+  .ws-stat > div {
+    font-size: 11px;
+  }
+  .ws-panel {
+    padding: 16px;
+  }
+  .ws-demo {
+    font-size: 10px;
+  }
+  .ws-vehicles {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 360px) {
+  .ws-stats {
+    grid-template-columns: 1fr;
+  }
+  .ws-role {
+    display: none;
+  }
+}
+
+/* Formularios reales del taller y evidencia fotográfica. */
+.workspace fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.ws-progress input {
+  display: block;
+  margin-top: 8px;
+  width: 100%;
+}
+.ws-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+.ws-entry {
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+  overflow-wrap: anywhere;
+}
+.ws-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+.ws-photos figure {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.ws-photos img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.ws-photos figcaption {
+  color: #64748b;
+  font-size: 12px;
+}
+@media (max-width: 720px) {
+  .ws-panel-title {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+/* Portales de mecánico y cliente: componentes compartidos, datos reales. */
+.role-portal { min-width: 0; }
+.role-welcome { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 24px; }
+.role-welcome h2 { font-size: 28px; margin: 6px 0; letter-spacing: -.6px; }
+.role-welcome p:not(.ws-overline) { color: #64748b; max-width: 620px; margin-bottom: 0; }
+.role-welcome .ws-secondary { flex-shrink: 0; }
+.role-stats { margin-top: 20px; }
+.role-guide { border-left: 3px solid #ea580c; background: #fff7ed; padding: 16px 20px; border-radius: 0 10px 10px 0; margin-bottom: 24px; }
+.role-guide strong { color: #9a3412; }
+.role-guide p { margin: 6px 0 0; color: #7c4a2d; }
+.role-list { padding: 24px; }
+.role-result-count { white-space: nowrap; color: #64748b; font-size: 12px; }
+.role-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 20px 0 12px; }
+.role-filters label { display: grid; gap: 7px; color: #475569; font-size: 12px; }
+.role-filters input, .role-filters select { width: 100%; min-width: 0; }
+.role-order-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 18px; margin-top: 18px; }
+.role-order-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; min-width: 0; }
+.role-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.role-plate { display: inline-block; padding: 6px 10px; border: 1px solid #d8e0ea; border-radius: 6px; background: #f8fafc; font-weight: 700; letter-spacing: 1px; font-size: 12px; overflow-wrap: anywhere; }
+.role-order-card h3 { margin: 18px 0 4px; font-size: 18px; }
+.role-order-card p { margin: 4px 0 12px; }
+.role-order-description { overflow-wrap: anywhere; white-space: pre-wrap; }
+.role-card-bottom { margin-top: auto; padding-top: 18px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+.role-card-bottom small { color: #64748b; }
+.role-tracking { padding: 0; }
+.role-tracking > .ws-panel-title { margin: 26px 0 18px; }
+.role-tracking-card { margin-bottom: 20px; }
+.role-tracking-card h3 { margin: 12px 0 4px; font-size: 21px; }
+.role-tracking-card .role-card-top p { margin: 6px 0 0; }
+.role-current-service { margin-top: 20px; padding-top: 18px; border-top: 1px solid #e2e8f0; }
+.role-current-service h4 { margin: 0; font-size: 15px; }
+.role-no-service { padding: 16px; background: #f8fafc; border-radius: 8px; }
+.role-sync { color: #64748b; font-size: 11px; }
+.role-progress { margin: 18px 0 22px; }
+.role-progress-caption { color: #475569; font-size: 13px; }
+.role-progress ol { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
+.role-progress li { display: flex; flex-direction: column; gap: 8px; align-items: center; padding: 12px 5px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; color: #64748b; font-size: 11px; text-align: center; }
+.role-progress li > span:first-child { border-radius: 50%; background: #e2e8f0; width: 24px; height: 24px; display: grid; place-items: center; font-weight: 700; }
+.role-progress li.is-current { background: #fff7ed; color: #9a3412; border-color: #fdba74; font-weight: 700; }
+.role-progress li.is-current > span:first-child { background: #c64709; color: white; }
+.role-detail-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; background: #e9edf2; border-radius: 10px; margin-top: 24px; }
+.role-detail-tabs button { flex: 1; padding: 12px; background: transparent; color: #475569; font-weight: 600; }
+.role-detail-tabs button.is-selected { background: white; color: #9a3412; box-shadow: 0 2px 6px #1e293b12; }
+.workspace [hidden] { display: none !important; }
+@media(max-width: 900px) { .role-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media(max-width: 600px) {
+  .role-welcome { flex-direction: column; align-items: flex-start; }
+  .role-welcome h2 { font-size: 24px; }
+  .role-list { padding: 16px; }
+  .role-filters { grid-template-columns: 1fr; }
+  .role-progress ol { gap: 4px; }
+  .role-progress li { font-size: 10px; padding: 10px 2px; overflow-wrap: anywhere; }
+  .role-detail-tabs button { font-size: 12px; padding: 10px 7px; }
+  .role-order-card { padding: 16px; }
+}
+.quote-line { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; padding-block: 12px; }
+.quote-line input, .quote-line select { min-width: 0; width: 100%; }
+@media (max-width: 800px) { .quote-line { grid-template-columns: 1fr; } }
+/* Portal de trabajo: superficies neutras y acentos de AutoTrack. */
+.workspace { background: #f5f5f3; color: #252b30; }
+.ws-sidebar { background: #f1f2ef; border-color: #dddfda; overflow-y: auto; }
+.ws-logo { margin: 14px 12px 0; padding: 12px; height: 62px; border-radius: 10px; background: #252d32; font-size: 21px; }
+.ws-logo img { width: 34px; height: 34px; }
+.ws-nav-caption { color: #717970; letter-spacing: 1px; }
+.ws-sidebar nav { gap: 4px; }
+.ws-sidebar nav button { padding: 11px 12px; color: #575f59; }
+.ws-sidebar nav button.ws-nav-active { background: white; color: #252d32; box-shadow: 0 1px 4px #16241612; border: 1px solid #dde1d9; }
+.nav-mark { color: #858c81; width: 18px; font-size: 18px; text-align: center; }
+.ws-nav-active .nav-mark { color: #c34c12; }
+.ws-sidebar-bottom { margin: auto 12px 14px; padding: 15px 10px; }
+.ws-person { background: #fff; padding: 10px; border: 1px solid #e2e4df; border-radius: 9px; }
+.ws-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 66px; background: #fff; border-color: #e3e5df; }
+.dashboard-date { margin-left: auto; color: #667065; }
+.ws-main { padding-top: 12px; }
+.ws-title { margin: 20px 0; }
+.ws-title h1 { font-size: clamp(24px, 2.3vw, 30px); letter-spacing: -1px; }
+.ws-panel { border-color: #e0e3dc; border-radius: 12px; box-shadow: 0 2px 5px #25342204; }
+.ws-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 14px; }
+.ws-stat { border: 1px solid #e0e3dc; border-radius: 11px; box-shadow: 0 2px 4px #1c321105; padding: 20px; background: linear-gradient(to bottom, white 80%, #f1f3ef 80%); }
+.ws-stat > div { text-transform: uppercase; font-size: 10px; letter-spacing: 1px; color: #667065; }
+.ws-stat strong { font-size: 32px; color: #252d32; font-variant-numeric: tabular-nums; }
+.ws-stat small { display: block; padding-top: 10px; }
+.workspace .ws-primary { background: #c64c10; box-shadow: none; }
+.workspace .ws-primary:hover { background: #a83c08; }
+.workspace .ws-secondary { background: #fff; color: #3d473d; border-color: #dce1d7; }
+.workspace button:focus-visible { outline: 3px solid #edb18f; outline-offset: 3px; }
+.role-welcome { margin: 22px 0; }
+.role-welcome h2 { font-size: 24px; }
+.role-order-card { background: #fff; border-color: #e0e4dd; padding: 18px; }
+.role-order-card:hover { border-color: #b5bdb0; box-shadow: 0 3px 10px #15251108; }
+.role-plate { background: #f2f4ef; border-color: #dce2d6; color: #394337; }
+.workflow-guide { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #e0e3dc; border-radius: 12px; background: #fff; margin: 20px 0; overflow: hidden; }
+.workflow-guide > div { padding: 18px; display: flex; gap: 12px; align-items: center; border-right: 1px solid #eceee8; }
+.workflow-guide span { color: #a5ac9e; font-size: 20px; font-weight: 600; }
+.workflow-guide strong { color: #535d4c; font-size: 12px; font-weight: 500; }
+.client-pass { display: flex; justify-content: space-between; align-items: center; padding: 24px; border: 1px solid #d8dfcd; background: #eaf0e1; border-radius: 12px; gap: 16px; }
+.client-pass h2 { font-size: 17px; margin: 10px 0; }
+.client-pass h2 span { display: block; font-family: monospace; font-size: 30px; letter-spacing: 5px; margin-top: 8px; color: #354930; overflow-wrap: anywhere; }
+.client-pass p { margin-bottom: 0; color: #58654f; }
+.pass-symbol { font-size: 80px; color: #a8ba97; }
+.analytics-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-top: 22px; }
+.panel-heading { border-bottom: 1px solid #e8ebe3; padding-bottom: 14px; margin-bottom: 20px; }
+.panel-heading h2 { margin: 8px 0; }
+.panel-heading > p:last-child { color: #7b8474; font-size: 12px; }
+.chart-row { display: grid; grid-template-columns: 130px 1fr 30px; gap: 12px; align-items: center; margin: 18px 0; font-size: 12px; }
+.chart-track { height: 14px; background: #f0f2ed; border-radius: 3px; overflow: hidden; }
+.chart-track > div { height: 100%; background: #667b55; border-radius: 3px; }
+.chart-row:nth-child(3n) .chart-track > div { background: #ca6b37; }
+.brand-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #edf0e8; }
+.brand-row > span:last-child { margin-left: auto; color: #6b7563; font-size: 12px; }
+.brand-initial { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: #f0f3ea; color: #5d714d; }
+.hub-search { display: grid; gap: 8px; margin: 22px 0; max-width: 460px; }
+.hub-row { display: grid; grid-template-columns: 110px 1fr auto auto; gap: 20px; padding: 20px 0; align-items: center; border-top: 1px solid #e5e9df; }
+.hub-row small { display: block; margin-top: 6px; color: #77816e; }
+.role-detail-tabs { background: #eaece6; }
+.role-progress li { background: #f3f5ef; border-color: #e2e7d9; }
+@media(max-width: 1050px) { .analytics-grid { grid-template-columns: 1fr; } .workflow-guide { grid-template-columns: repeat(2,1fr); } .hub-row { grid-template-columns: 100px 1fr; } }
+@media(max-width: 720px) { .dashboard-date { display:none; } .client-pass { padding:18px; } .pass-symbol { display:none; } .ws-header { padding: 0 16px; } .workflow-guide > div { padding:12px; } .workflow-guide strong { font-size:11px; } .chart-row { grid-template-columns:110px 1fr 24px; gap:8px; } .ws-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } .hub-row { gap:12px; } .ws-sidebar-bottom { margin-top:auto; } }
+.list-tools { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.compact-orders { display:block; }
+.compact-orders .role-order-card { display:grid; grid-template-columns: 1.2fr 1fr 1fr; align-items:center; gap:14px; margin-top:10px; border-radius:8px; }
+.compact-orders .role-order-card h3 { margin:0; font-size:14px; }
+.compact-orders .role-order-card > p:not(.role-order-description) { margin:0; font-size:12px; }
+.compact-orders .role-order-description { grid-column:1/3; margin:0; font-size:12px; }
+.compact-orders .role-card-bottom { padding:0; }
+@media(max-width:720px) { .compact-orders .role-order-card { grid-template-columns:1fr; } .compact-orders .role-order-description { grid-column:auto; } }
+.report-strip { display:flex; flex-wrap:wrap; gap:24px; padding:16px 20px; background:#eaf0e1; border:1px solid #dce4d1; border-radius:10px; color:#536449; margin-top:18px; font-size:12px; }
+.report-strip strong { margin-right:5px; color:#304326; }
+.mechanic-filters { margin: 20px 0; }
+.mechanic-filters > label { display:grid; gap:8px; max-width:560px; color:#536449; }
+.mechanic-filters input { width:100%; }
+.filter-chips { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+.workspace .filter-chips button { padding:9px 14px; border:1px solid #dce1d7; background:#fff; color:#46553b; border-radius:20px; font-size:12px; }
+.workspace .filter-chips button.is-selected { background:#354930; color:#fff; border-color:#354930; }
+.plate-input { display:flex; gap:10px; }
+.plate-input select { max-width:180px; }
+.priority { display:inline-block; padding:5px 10px; border-radius:6px; font-weight:700; }
+.priority-high { background:#fee2e2; color:#991b1b; }
+.priority-medium { background:#fef3c7; color:#854d0e; }
+.priority-low { background:#dcfce7; color:#166534; }
+.confirm-dialog { border:1px solid #dce1d7; border-radius:14px; padding:28px; width:min(480px,90vw); color:#25302a; }
+.confirm-dialog::backdrop { background:#0f172a88; }
+.workspace button.chart-row, .workspace button.brand-row, .workspace button.mechanic-link { width:100%; background:transparent; color:inherit; text-align:left; }
+.workspace .ws-stat { text-align:left; }
+.workspace button.ws-stat[aria-pressed=true] { outline:2px solid #c64c10; }
+.mechanic-workflow { display:grid; gap:20px; } .workspace .repair-check { display:flex; align-items:center; gap:12px; } .workspace .repair-check input { width:18px; min-width:18px; height:18px; } .preserve-lines { white-space:pre-wrap; } .mechanic-workflow summary { cursor:pointer; font-weight:600; }
+/* Controles compartidos y composición del administrador. */
+.workspace { font-family:'Aptos','Segoe UI',sans-serif; }
+.workspace button { border-radius:999px; transition:background .18s,box-shadow .18s,transform .18s,border-color .18s; }
+.workspace button:not(:disabled):hover { transform:translateY(-2px); box-shadow:0 5px 14px #24312512; }
+.workspace button:not(:disabled):active { transform:translateY(0); }
+.workspace button:disabled { cursor:not-allowed; }
+.workspace input,.workspace select { border-radius:999px; transition:border-color .2s,box-shadow .2s; }
+.workspace textarea { border-radius:16px; }
+.workspace :is(input,select,textarea):not(:disabled):hover { border-color:#8b9584; }
+.workspace :is(input,select,textarea):focus-visible { outline:2px solid #c64c10; outline-offset:2px; box-shadow:0 0 0 5px #c64c1010; }
+.workspace :is(.role-filters,.ws-filters) { background:#f5f6f2; border:1px solid #e3e7dd; padding:18px; border-radius:22px; gap:16px; }
+.workspace input[type=checkbox] { accent-color:#c64c10; border-radius:4px; }
+.workspace-admin { background:#efefeb; }
+.workspace-admin .ws-header { background:#efefeb; border-bottom:0; height:80px; }
+.workspace-admin .ws-sidebar { border-right:0; background:#fff; }
+.workspace-admin .ws-logo { border-radius:0 0 28px 0; }
+.workspace-admin .ws-main { max-width:1500px; padding:12px 32px 32px; }
+.workspace-admin .ws-title h1 { font-weight:500; font-size:30px; letter-spacing:-1px; }
+.admin-welcome { display:flex; justify-content:space-between; align-items:center; gap:24px; margin:8px 0 28px; }
+.admin-welcome h2 { font-family:Georgia,'Times New Roman',serif; font-size:clamp(30px,3vw,42px); font-weight:400; letter-spacing:-1.5px; margin:8px 0; }
+.admin-welcome p { margin:8px 0; color:#667065; }
+.admin-welcome .ws-primary { flex-shrink:0; }
+.workspace-admin .ws-panel { border:1px solid #e3e4df; border-radius:26px; box-shadow:0 6px 22px #202c1b04; padding:26px; }
+.workspace-admin .ws-stat { border-radius:24px; background:white; padding:24px; border:1px solid #e1e3dc; min-height:155px; }
+.workspace-admin .ws-stat:first-child { background:linear-gradient(125deg,#25332c,#384836); border-color:transparent; }
+.workspace-admin .ws-stat:first-child :is(div,strong,small) { color:#fff; }
+.workspace-admin .ws-stat > strong { font-size:38px; font-weight:600; letter-spacing:-1.5px; }
+.workspace-admin .ws-stat small { display:flex; justify-content:space-between; color:#687361; font-size:11px; margin-top:12px; }
+.workspace-admin .ws-stat small span { font-size:17px; }
+.workspace-admin .report-strip { background:transparent; border:0; padding:4px 0 12px; gap:12px; }
+.workspace-admin .report-strip > span { border-radius:999px; background:#e3e8dc; padding:10px 16px; }
+.workspace-admin .analytics-grid { gap:22px; }
+.workspace-admin .panel-heading h2,.workspace-admin .ws-panel > h2 { font-size:20px; font-weight:600; letter-spacing:-.5px; }
+.workspace-admin .chart-row { padding:9px 12px; margin:7px 0; }
+.workspace-admin .chart-track { height:18px; border-radius:999px; background:#f0f1eb; overflow:hidden; }
+.workspace-admin .chart-track > div { border-radius:999px; background:linear-gradient(90deg,#33492e,#718263); transition:width .35s ease; }
+.workspace-admin .brand-row,.workspace-admin .mechanic-link { padding:16px; border-radius:18px; border:1px solid #e9ece3; margin:10px 0; }
+.workspace-admin button:is(.brand-row,.chart-row,.mechanic-link):hover { background:#f2f5ec; }
+.workspace-admin .brand-initial { border-radius:50%; }
+.workspace-admin .ws-table-wrap { border-radius:18px; border:1px solid #e5e7e1; }
+.workspace-admin tbody tr { transition:background .18s; }
+.workspace-admin tbody tr:hover { background:#f5f7f0; }
+@media(max-width:760px) { .admin-welcome { align-items:flex-start; flex-direction:column; gap:12px; } .workspace-admin .ws-main { padding:12px 16px 24px; } .workspace-admin .ws-panel { padding:18px; border-radius:22px; } .workspace-admin .ws-stat { padding:17px; min-height:140px; } .workspace-admin .chart-row { grid-template-columns:100px 1fr 24px; padding:8px 0; } .workspace-admin .ws-header { height:66px; } }
+@media(prefers-reduced-motion:reduce) { .workspace * { transition:none!important; animation:none!important; } }
+.workspace .ws-sidebar nav button, .workspace .role-detail-tabs button, .workspace .ws-primary, .workspace .ws-secondary { border-radius:999px; }

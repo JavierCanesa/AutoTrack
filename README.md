@@ -1,37 +1,65 @@
 # AutoTrack
 
-Sistema web universitario para gestionar y dar seguimiento a vehículos en un taller mecánico. Contempla los roles de administrador, mecánico y cliente.
+Sistema universitario para gestionar vehículos y servicios de un taller.
 
 ## Arquitectura de tres capas
 
 | Capa | Tecnología | Responsabilidad |
 | --- | --- | --- |
-| Presentación | React y TypeScript | Pantallas y peticiones HTTP. |
-| Negocio | FastAPI y Python | API, validaciones y reglas de negocio. |
-| Datos | Supabase y PostgreSQL | Persistencia; Supabase Auth y Storage para usuarios y fotografías. |
+| Presentación | React y TypeScript | Formularios y vistas de administrador, mecánico y cliente. |
+| Negocio | FastAPI | Autenticación, permisos, validaciones y operaciones del taller. |
+| Datos | Supabase | PostgreSQL, Authentication y Storage. |
 
-El backend se encuentra en `Backend/`. Actualmente incluye una ruta de bienvenida y una consulta de prueba a `public.service_types`. El frontend en `Frontend/` permite consultar ese catálogo.
+## Qué funciona
 
-## Iniciar el frontend
+- Login, registro de clientes, renovación de sesión y cierre de sesión.
+- Administrador: usuarios, vehículos, órdenes, asignación de mecánicos y resumen del taller.
+- Mecánico: órdenes asignadas, diagnósticos, piezas, avances y fotografías.
+- Cliente: registro de sus vehículos, seguimiento visual e historial con filtros de fecha, vehículo y servicio.
 
-Desde esta carpeta:
+Las vistas consultan datos reales. Las fotografías requieren un bucket privado de Storage.
+
+## Iniciar
+
+Primera vez: sigue [Backend/README.md](Backend/README.md) para crear `.venv`, instalar dependencias y configurar Supabase.
+
+Terminal del backend, desde la raíz:
+
+```powershell
+cd Backend
+.\.venv\Scripts\Activate.ps1
+python -m uvicorn FastApi.main:app --reload
+```
+
+Otra terminal, desde la raíz:
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Abre http://localhost:5173. Para consultar datos, inicia también FastAPI en otra terminal. Consulta los pasos en [Frontend/README.md](Frontend/README.md).
+- Aplicación: http://localhost:5173
+- API y documentación interactiva: http://127.0.0.1:8000/docs
+- Guía del frontend: [Frontend/README.md](Frontend/README.md)
 
-## Instalación y ejecución
+Para detener cada servidor: **Ctrl+C**. Para desactivar el entorno: `deactivate`.
 
-La guía completa está en [Backend/README.md](Backend/README.md). Incluye:
+## Verificar antes de subir cambios
 
-- Requisitos y creación del entorno virtual `.venv`.
-- Activación manual en PowerShell y ejecución sin activar el entorno.
-- Instalación y verificación de dependencias.
-- Configuración local de Supabase.
-- Ejecución y pruebas en navegador, Swagger y Postman.
-- Solución de errores frecuentes.
+Desde la raíz:
 
-Cada integrante debe crear su propio entorno virtual y su archivo `.env`. No se comparten ni se suben a Git las carpetas `.venv` ni las credenciales.
+```powershell
+npm run build
+```
+
+Desde Backend, con `.venv` activo:
+
+```powershell
+python -m pip check
+```
+
+No subas `.env`, `.venv`, `node_modules` ni `dist`. Cada integrante configura su entorno.
+
+tunelización
+
+cloudflared tunnel --url http://localhost:5173
