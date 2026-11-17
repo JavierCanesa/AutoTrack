@@ -1,4 +1,6 @@
-import ConfirmDialog from "../components/ConfirmDialog";
+﻿import ConfirmDialog from "../components/ConfirmDialog";
+import { CardGridSkeleton } from "../components/Skeleton";
+import EmptyState from "../components/EmptyState";
 import { useEffect, useState, type SubmitEvent } from "react";
 import {
   authenticatedFetch,
@@ -56,6 +58,10 @@ export default function QuotesPanel({
   onChange: () => void;
 }) {
   const [missingDiagnosis, setMissingDiagnosis] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{
+    type: "accept" | "reject";
+    quote: Quote;
+  } | null>(null);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [items, setItems] = useState<Item[]>([blank()]);
   const [error, setError] = useState("");
@@ -166,20 +172,22 @@ export default function QuotesPanel({
   }
   return (
     <section className="ws-panel ws-progress">
-      <h2>Cotizaciones</h2>
-      <button
-        className="ws-secondary"
-        disabled={busy}
-        onClick={() => setReload((n) => n + 1)}
-      >
-        Actualizar cotizaciones
-      </button>
+      <div className="ws-panel-title">
+        <h2>Cotizaciones</h2>
+        <button
+          className="ws-primary"
+          disabled={busy}
+          onClick={() => setReload((n) => n + 1)}
+        >
+          Actualizar cotizaciones
+        </button>
+      </div>
       {error && (
         <p role="alert" className="error">
           {error}
         </p>
       )}
-      {loading && <p>Cargando cotizaciones…</p>}
+      {loading && <CardGridSkeleton count={2} />}
       {missingDiagnosis && (
         <ConfirmDialog
           title="No se puede crear la cotización"
@@ -201,28 +209,87 @@ export default function QuotesPanel({
           </p>
         </ConfirmDialog>
       )}
-      {!loading && !quotes.length && <p>Aún no hay cotizaciones.</p>}
-      {quotes.map((q, index) => (
-        <article className="ws-entry" key={q.id}>
-          <h3>
-            Versión {q.version} · {names[q.status]}
-          </h3>
-          <p>Válida hasta {q.valid_until}</p>
-          {q.items.map((item, i) => (
-            <p key={i}>
-              {item.kind === "LABOR" ? "Mano de obra" : "Pieza"}:{" "}
-              {item.description} · {item.quantity} × $
-              {Number(item.unit_price).toFixed(2)}
+      {confirmAction && (
+        <ConfirmDialog
+          title={
+            confirmAction.type === "accept"
+              ? "Confirmar aceptación de cotización"
+              : "Rechazar cotización"
+          }
+          acceptLabel={
+            confirmAction.type === "accept"
+              ? "Sí, aceptar cotización"
+              : "Sí, rechazar"
+          }
+          busy={busy}
+          onAccept={async () => {
+            const target = confirmAction;
+            setConfirmAction(null);
+            await write(`/${target.quote.id}/${target.type}`);
+          }}
+          onCancel={() => setConfirmAction(null)}
+        >
+          {confirmAction.type === "accept" ? (
+            <p>
+              ¿Confirmas que aceptas la versión{" "}
+              <strong>{confirmAction.quote.version}</strong> por un total de{" "}
+              <strong>
+                ${Number(confirmAction.quote.total).toFixed(2)} USD
+              </strong>
+              ? El taller procederá con la reparación.
             </p>
-          ))}
-          <strong>Total: ${Number(q.total).toFixed(2)} USD</strong>
-          <p>{q.notes}</p>
+          ) : (
+            <p>
+              ¿Rechazar la cotización versión{" "}
+              <strong>{confirmAction.quote.version}</strong>? La orden
+              permanecerá en espera para ajustes.
+            </p>
+          )}
+        </ConfirmDialog>
+      )}
+      {!loading && !quotes.length && (
+        <EmptyState
+          title="Aún no hay cotizaciones"
+          description="Cuando se registre el diagnóstico y se genere una cotización para esta orden, aparecerá aquí."
+        />
+      )}
+      {quotes.map((q, index) => (
+        <article className="at-quote-card" key={q.id}>
+          <div className="at-quote-card-head">
+            <div>
+              <h3>
+                Versión {q.version} · {names[q.status]}
+              </h3>
+              <small style={{ color: "var(--ink-soft)" }}>
+                Válida hasta {q.valid_until}
+              </small>
+            </div>
+            <span className="at-quote-total-pill">
+              Total: ${Number(q.total).toFixed(2)} USD
+            </span>
+          </div>
+          <div className="at-quote-items">
+            {q.items.map((item, i) => (
+              <div className="at-quote-item-row" key={i}>
+                <span>
+                  <span className="at-quote-item-kind">
+                    {item.kind === "LABOR" ? "Mano de obra" : "Pieza"}
+                  </span>
+                  {item.description}
+                </span>
+                <strong>
+                  {item.quantity} × ${Number(item.unit_price).toFixed(2)}
+                </strong>
+              </div>
+            ))}
+          </div>
+          {q.notes && <p>{q.notes}</p>}
           {q.decided_at && (
             <p>Respuesta: {new Date(q.decided_at).toLocaleString("es-SV")}</p>
           )}
           <div className="ws-actions">
             <button
-              className="ws-secondary"
+              className="ws-primary"
               disabled={busy}
               onClick={() => download(q)}
             >
@@ -245,28 +312,14 @@ export default function QuotesPanel({
                       <button
                         className="ws-primary"
                         disabled={busy}
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              `¿Aceptas la versión ${q.version} por $${Number(q.total).toFixed(2)} USD?`,
-                            )
-                          )
-                            void write(`/${q.id}/accept`);
-                        }}
+                        onClick={() => setConfirmAction({ type: "accept", quote: q })}
                       >
                         Aceptar cotización
                       </button>
                       <button
                         className="ws-secondary"
                         disabled={busy}
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              "¿Rechazar esta cotización? La orden permanecerá en espera.",
-                            )
-                          )
-                            void write(`/${q.id}/reject`);
-                        }}
+                        onClick={() => setConfirmAction({ type: "reject", quote: q })}
                       >
                         Rechazar
                       </button>
@@ -374,6 +427,22 @@ export default function QuotesPanel({
                 Alcance y condiciones
                 <textarea name="notes" maxLength={2000} />
               </label>
+              <div className="at-quote-total-bar">
+                <span>Total estimado del borrador</span>
+                <strong>
+                  $
+                  {items
+                    .reduce(
+                      (sum, it) =>
+                        sum +
+                        (Number(it.quantity) || 0) *
+                          (Number(it.unit_price) || 0),
+                      0,
+                    )
+                    .toFixed(2)}{" "}
+                  USD
+                </strong>
+              </div>
               <button
                 className="ws-primary"
                 onClick={(e) => {

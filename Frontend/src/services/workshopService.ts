@@ -13,8 +13,78 @@ export async function api<T>(path: string, method = 'GET', data?: unknown): Prom
   const response = await authenticatedFetch(`/api${path}`, { method, headers: { 'Content-Type': 'application/json' }, body: data === undefined ? undefined : JSON.stringify(data) });
   return readResponse<T>(response);
 }
+
+const PHOTO_UPLOAD_LIMIT = 5 * 1024 * 1024;
+const PHOTO_SOURCE_LIMIT = 30 * 1024 * 1024;
+const DIRECT_PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+function loadImage(file: File) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('No se pudo leer la fotografía. En iPhone selecciona una foto compatible o una captura de pantalla.'));
+    };
+    image.src = url;
+  });
+}
+
+function jpegBlob(canvas: HTMLCanvasElement, quality: number) {
+  return new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob(
+      blob => blob ? resolve(blob) : reject(new Error('No se pudo preparar la fotografía.')),
+      'image/jpeg',
+      quality,
+    ),
+  );
+}
+
+async function preparePhoto(file: File) {
+  if (!file.size) throw new Error('Selecciona una fotografía.');
+  if (file.size > PHOTO_SOURCE_LIMIT)
+    throw new Error('La fotografía original debe pesar como máximo 30 MB.');
+  if (DIRECT_PHOTO_TYPES.has(file.type) && file.size <= PHOTO_UPLOAD_LIMIT)
+    return file;
+
+  const image = await loadImage(file);
+  const longestSide = Math.max(image.naturalWidth, image.naturalHeight);
+  if (!longestSide) throw new Error('La fotografía no contiene una imagen válida.');
+
+  for (const maximumSide of [2560, 2048, 1600, 1280]) {
+    const scale = Math.min(1, maximumSide / longestSide);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('El navegador no pudo preparar la fotografía.');
+    context.fillStyle = '#fff';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = 'high';
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    for (const quality of [0.88, 0.75, 0.62]) {
+      const blob = await jpegBlob(canvas, quality);
+      if (blob.size <= PHOTO_UPLOAD_LIMIT) {
+        const baseName = file.name.replace(/\.[^/.]+$/, '').trim().slice(0, 120) || 'foto';
+        return new File([blob], `${baseName}.jpg`, {
+          type: 'image/jpeg',
+          lastModified: Date.now(),
+        });
+      }
+    }
+  }
+  throw new Error('No se pudo reducir la fotografía a 5 MB. Selecciona otra imagen.');
+}
+
 export async function uploadPhoto(orderId: string, updateId: string, file: File) {
-  const form = new FormData(); form.append('file', file);
+  const prepared = await preparePhoto(file);
+  const form = new FormData(); form.append('file', prepared);
   return readResponse<Photo>(await authenticatedFetch(`/api/work-orders/${orderId}/updates/${updateId}/photos`, { method: 'POST', body: form }));
 }
 export async function loadPhoto(orderId: string, photoId: string) {

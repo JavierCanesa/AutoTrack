@@ -1,6 +1,7 @@
-import MechanicWorkflow from "../components/MechanicWorkflow";
+﻿import MechanicWorkflow from "../components/MechanicWorkflow";
 import Evidence from "../components/Evidence";
 import QuotesPanel from "./QuotesPanel";
+import EmptyState from "../components/EmptyState";
 import { useEffect, useState, type SubmitEvent } from "react";
 import type { AuthUser } from "../services/authService";
 import type { ManagedUser } from "../services/userService";
@@ -232,20 +233,27 @@ export default function OrderDetail({
                 aria-label="Secciones del servicio"
               >
                 {[
-                  ["diagnoses", "Diagnóstico y piezas"],
-                  ["updates", "Avances"],
-                  ["photos", "Fotografías"],
-                  ["quotes", "Cotización"],
-                ].map(([value, label]) => (
+                  [
+                    "diagnoses",
+                    "Diagnóstico y piezas",
+                    detail.diagnoses.length + detail.parts.length,
+                  ],
+                  ["updates", "Avances", detail.updates.length],
+                  ["photos", "Fotografías", detail.photos.length],
+                  ["quotes", "Cotización", null],
+                ].map(([value, label, count]) => (
                   <button
-                    key={value}
+                    key={String(value)}
                     type="button"
                     disabled={busy}
                     aria-current={tab === value ? "page" : undefined}
                     className={tab === value ? "is-selected" : ""}
-                    onClick={() => setTab(value)}
+                    onClick={() => setTab(String(value))}
                   >
-                    {label}
+                    <span>{label}</span>
+                    {count !== null && Number(count) > 0 && (
+                      <span className="at-tab-count">{count}</span>
+                    )}
                   </button>
                 ))}
               </nav>
@@ -264,41 +272,66 @@ export default function OrderDetail({
                   <article className="ws-panel">
                     <h2>Diagnósticos</h2>
                     {detail.diagnoses.length ? (
-                      detail.diagnoses.map((d) => (
-                        <div className="ws-entry" key={d.id}>
-                          {d.symptoms && <p>Síntomas: {d.symptoms}</p>}
-                          <p>{d.description}</p>
-                          <small>
-                            {new Date(d.created_at).toLocaleString("es-SV")}
-                          </small>
-                        </div>
-                      ))
+                      <div className="at-detail-list">
+                        {detail.diagnoses.map((d) => (
+                          <div className="at-detail-item" key={d.id}>
+                            {d.symptoms && (
+                              <div className="at-detail-symptoms">
+                                <strong>Síntomas:</strong> {d.symptoms}
+                              </div>
+                            )}
+                            <p className="at-detail-item-text">
+                              {d.description}
+                            </p>
+                            <small className="at-detail-item-meta">
+                              Registrado el{" "}
+                              {new Date(d.created_at).toLocaleString("es-SV")}
+                            </small>
+                          </div>
+                        ))}
+                      </div>
                     ) : (
-                      <p>Sin diagnósticos registrados.</p>
+                      <EmptyState
+                        title="Sin diagnósticos registrados"
+                        description="El mecánico aún no ha guardado el diagnóstico de esta orden."
+                      />
                     )}
                   </article>
                   <article className="ws-panel">
                     <h2>Piezas involucradas</h2>
                     {detail.parts.length ? (
-                      detail.parts.map((p) => (
-                        <div className="ws-entry" key={p.id}>
-                          <strong>{p.part_name}</strong>
-                          <p
-                            className={`priority priority-${p.priority.toLowerCase()}`}
-                          >
-                            Prioridad:{" "}
-                            {{ HIGH: "Alta", MEDIUM: "Media", LOW: "Baja" }[
-                              p.priority
-                            ] || "Media"}
-                          </p>
-                          <p>
-                            {p.action === "REPAIR" ? "Reparar" : "Reemplazar"} ·{" "}
-                            {p.notes || "Sin notas"}
-                          </p>
-                        </div>
-                      ))
+                      <div className="at-detail-list">
+                        {detail.parts.map((p) => (
+                          <div className="at-detail-item" key={p.id}>
+                            <div className="at-part-head">
+                              <span className="at-part-name">
+                                {p.part_name}
+                              </span>
+                              <span
+                                className={`priority priority-${p.priority.toLowerCase()}`}
+                              >
+                                Prioridad:{" "}
+                                {{ HIGH: "Alta", MEDIUM: "Media", LOW: "Baja" }[
+                                  p.priority
+                                ] || "Media"}
+                              </span>
+                            </div>
+                            <p className="at-detail-item-text">
+                              <span className="at-part-action-tag">
+                                {p.action === "REPAIR"
+                                  ? "Reparar"
+                                  : "Reemplazar"}
+                              </span>
+                              {p.notes || "Sin notas adicionales."}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     ) : (
-                      <p>Sin piezas registradas.</p>
+                      <EmptyState
+                        title="Sin piezas registradas"
+                        description="No se han agregado piezas para reparar o reemplazar en esta orden."
+                      />
                     )}
                   </article>
                 </div>
@@ -307,47 +340,64 @@ export default function OrderDetail({
                 <article className="ws-panel ws-progress">
                   <h2>Avances del servicio</h2>
                   {detail.updates.length ? (
-                    <ol className="ws-timeline">
+                    <ol className="at-timeline">
                       {detail.updates.map((u) => (
-                        <li key={u.id}>
-                          <strong>{labels[u.status]}</strong>
-                          <p>{u.comment}</p>
-                          <small>
-                            {new Date(u.created_at).toLocaleString("es-SV")}
-                          </small>
+                        <li className="at-timeline-item" key={u.id}>
+                          <div className="at-timeline-head">
+                            <span
+                              className={`ws-badge ws-${u.status.toLowerCase()}`}
+                            >
+                              {labels[u.status]}
+                            </span>
+                            <small className="at-detail-item-meta">
+                              {new Date(u.created_at).toLocaleString("es-SV")}
+                            </small>
+                          </div>
+                          <p className="at-detail-item-text">
+                            {u.comment || "Actualización de estado."}
+                          </p>
                         </li>
                       ))}
                     </ol>
                   ) : (
-                    <p>Sin avances registrados.</p>
+                    <EmptyState
+                      title="Sin avances registrados"
+                      description="Aquí aparecerá la línea de tiempo con cada progreso del servicio."
+                    />
                   )}
                 </article>
               </div>
               <div hidden={tab !== "photos"}>
                 <article className="ws-panel ws-progress">
                   <h2>Evidencia fotográfica</h2>
-                  <div className="ws-photos">
-                    {tab === "photos" &&
-                      detail.photos.map((p) => {
-                        const advance = detail.updates.find(
-                          (update) => update.id === p.service_update_id,
-                        );
-                        return (
-                          <div key={p.id}>
-                            {advance && (
-                              <p>
-                                {labels[advance.status]} ·{" "}
-                                {new Date(advance.created_at).toLocaleString(
-                                  "es-SV",
-                                )}
-                              </p>
-                            )}
-                            <Evidence orderId={orderId} photo={p} />
-                          </div>
-                        );
-                      })}
-                  </div>
-                  {!detail.photos.length && <p>No hay fotografías.</p>}
+                  {detail.photos.length ? (
+                    <div className="at-photo-grid">
+                      {tab === "photos" &&
+                        detail.photos.map((p) => {
+                          const advance = detail.updates.find(
+                            (update) => update.id === p.service_update_id,
+                          );
+                          return (
+                            <div className="at-photo-card" key={p.id}>
+                              {advance && (
+                                <div className="at-detail-item-meta">
+                                  {labels[advance.status]} ·{" "}
+                                  {new Date(advance.created_at).toLocaleString(
+                                    "es-SV",
+                                  )}
+                                </div>
+                              )}
+                              <Evidence orderId={orderId} photo={p} />
+                            </div>
+                          );
+                        })}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      title="No hay fotografías"
+                      description="El mecánico aún no ha adjuntado evidencia fotográfica para esta orden."
+                    />
+                  )}
                 </article>
               </div>
             </>

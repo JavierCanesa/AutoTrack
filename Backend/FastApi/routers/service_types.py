@@ -1,30 +1,27 @@
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
-from httpx import HTTPError
-from postgrest.exceptions import APIError
-from supabase import Client
 
-from FastApi.db.database import get_supabase
-from FastApi.services.service_type_service import get_service_types
 from FastApi.services.service_type_service import get_workshop_service_types
 from FastApi.dependencies import current_user, workshop_client
+from FastApi.db.access import privileged_client, all_rows
 from FastApi.schemas.auth import AuthUser
-import httpx
 
 router = APIRouter(prefix="/api/service-types", tags=["Service types"])
 
 
 @router.get("/workshop")
-def workshop_catalog(user: AuthUser = Depends(current_user), client: httpx.Client = Depends(workshop_client)):
+def workshop_catalog(user: AuthUser = Depends(current_user), client: Any = Depends(workshop_client)):
     return get_workshop_service_types(client, user)
 
 
 @router.get("")
-def list_service_types(supabase: Client = Depends(get_supabase)):
-    """Prueba de lectura del catálogo public.service_types."""
+def list_service_types():
+    """Catálogo público de service_types."""
     try:
-        return get_service_types(supabase)
-    except (APIError, HTTPError):
+        with privileged_client() as client:
+            return all_rows(client, "service_types", select="id,name,description,created_at", order="name.asc,id.asc")
+    except Exception as e:
         raise HTTPException(
             status_code=502,
-            detail="No se pudo consultar service_types en Supabase. Revisa la conexión y los permisos de lectura.",
+            detail=f"No se pudo consultar service_types ({e}). Revisa la conexión a PostgreSQL local.",
         ) from None

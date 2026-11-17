@@ -1,5 +1,6 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { labels, orderLabel, type Order } from "../services/workshopService";
+import EmptyState from "./EmptyState";
 
 export const completed = (order: Order) =>
   ["COMPLETED", "DELIVERED"].includes(order.status);
@@ -93,12 +94,40 @@ export default function ServiceList({
         <div className="mechanic-filters">
           <label>
             Buscar un carro
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Escribe la placa, marca o servicio…"
-            />
+            <div className="at-search-wrap">
+              <span className="at-search-icon" aria-hidden="true">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </span>
+              <input
+                type="search"
+                className="at-search-input"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Escribe la placa, marca o servicio…"
+              />
+              {query && (
+                <button
+                  type="button"
+                  className="at-search-clear"
+                  aria-label="Limpiar búsqueda"
+                  onClick={() => setQuery("")}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </label>
           <div
             className="filter-chips"
@@ -148,12 +177,40 @@ export default function ServiceList({
           {!mechanic && (
             <label>
               Buscar
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Placa, marca o servicio"
-              />
+              <div className="at-search-wrap">
+                <span className="at-search-icon" aria-hidden="true">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </span>
+                <input
+                  type="search"
+                  className="at-search-input"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Placa, marca o servicio…"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    className="at-search-clear"
+                    aria-label="Limpiar búsqueda"
+                    onClick={() => setQuery("")}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </label>
           )}
           <label>
@@ -273,16 +330,23 @@ export default function ServiceList({
           ))}
         </div>
       ) : (
-        <div className="ws-empty">
-          <h3>No hay servicios para mostrar</h3>
-          <p>
-            {orders.length
-              ? "Prueba con otros filtros."
+        <EmptyState
+          title="No hay servicios para mostrar"
+          description={
+            orders.length
+              ? "Prueba ajustando o limpiando los filtros para ver otros registros."
               : history
                 ? "Los servicios finalizados aparecerán aquí."
-                : "Los servicios aparecerán cuando el taller registre una orden."}
-          </p>
-        </div>
+                : "Los servicios aparecerán cuando el taller registre una orden."
+          }
+          action={
+            orders.length ? (
+              <button className="ws-secondary" onClick={clear}>
+                Limpiar filtros
+              </button>
+            ) : undefined
+          }
+        />
       )}
     </section>
   );

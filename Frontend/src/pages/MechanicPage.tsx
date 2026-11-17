@@ -5,6 +5,8 @@ import { api, labels, type Order } from "../services/workshopService";
 import ServiceList, { closed } from "../components/ServiceList";
 import OrderDetail from "./OrderDetail";
 import ReceptionPage from "./ReceptionPage";
+import { CardGridSkeleton, TableSkeleton } from "../components/Skeleton";
+import EmptyState from "../components/EmptyState";
 
 export default function MechanicPage({
   user,
@@ -23,13 +25,17 @@ export default function MechanicPage({
   const [error, setError] = useState("");
   const [reload, setReload] = useState(0);
   const [statusFilter, setStatusFilter] = useState("");
+
   useEffect(() => {
     setStatusFilter("");
   }, [page, navigation]);
+
   const [detailTab, setDetailTab] = useState("diagnoses");
+
   useEffect(() => {
     setSelected(null);
   }, [page, navigation]);
+
   useEffect(() => {
     let disposed = false;
     if (selected) return;
@@ -49,6 +55,7 @@ export default function MechanicPage({
       disposed = true;
     };
   }, [reload, selected, user.id]);
+
   if (selected)
     return (
       <OrderDetail
@@ -60,6 +67,7 @@ export default function MechanicPage({
         onBack={() => setSelected(null)}
       />
     );
+
   if (page === "Recibir vehículo")
     return (
       <ReceptionPage
@@ -73,62 +81,96 @@ export default function MechanicPage({
         }}
       />
     );
+
   const history = page === "Historial de trabajos";
   const active = orders.filter((o) => !closed(o));
+  const initials =
+    `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase() ||
+    "M";
+
   return (
     <div className="role-portal">
-      <div className="role-welcome">
-        <div>
-          <p className="ws-overline">ÁREA DE MECÁNICA</p>
-          <h2>Hola, {user.first_name}</h2>
-          <p>
-            {history
-              ? "Consulta tus trabajos finalizados."
-              : "Tus órdenes asignadas, el diagnóstico y cada avance en un solo lugar."}
-          </p>
+      <div className="at-mechanic-welcome">
+        <div className="at-mechanic-welcome-left">
+          <div className="at-mechanic-welcome-avatar" aria-hidden="true">
+            {initials}
+          </div>
+          <div>
+            <p className="ws-overline">ÁREA DE MECÁNICA</p>
+            <h2>Hola, {user.first_name}</h2>
+            <p>
+              {history
+                ? "Consulta el historial completo de tus trabajos finalizados."
+                : "Tus órdenes asignadas, el diagnóstico y cada avance en un solo lugar."}
+            </p>
+          </div>
         </div>
         <button
-          className="ws-secondary"
+          className="ws-primary"
           disabled={loading}
           onClick={() => setReload((n) => n + 1)}
         >
-          Actualizar trabajos
+          {loading ? "Actualizando…" : "Actualizar trabajos"}
         </button>
       </div>
+
       {error && (
-        <p role="alert" className="error">
-          {error}
-        </p>
+        <article className="ws-panel">
+          <EmptyState
+            title="No se pudieron cargar tus trabajos"
+            description={error}
+            action={
+              <button
+                className="ws-primary"
+                onClick={() => setReload((n) => n + 1)}
+              >
+                Reintentar
+              </button>
+            }
+          />
+        </article>
       )}
+
       {loading ? (
-        <p role="status">Cargando tus trabajos…</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <CardGridSkeleton count={4} />
+          <TableSkeleton rows={4} columns={3} />
+        </div>
       ) : (
         !error && (
           <>
             {!history && (
-              <div className="ws-stats role-stats">
+              <div className="at-mechanic-stats">
                 {[
                   "RECEIVED",
                   "DIAGNOSIS",
                   "WAITING_APPROVAL",
                   "IN_REPAIR",
                   "TESTING",
-                ].map((status) => (
-                  <button
-                    className="ws-stat"
-                    key={status}
-                    aria-pressed={statusFilter === status}
-                    onClick={() =>
-                      setStatusFilter(statusFilter === status ? "" : status)
-                    }
-                  >
-                    <div>{labels[status as keyof typeof labels]}</div>
-                    <strong>
-                      {active.filter((o) => o.status === status).length}
-                    </strong>
-                    <small>Ver vehículos</small>
-                  </button>
-                ))}
+                ].map((status) => {
+                  const count = active.filter((o) => o.status === status).length;
+                  const isActive = statusFilter === status;
+                  return (
+                    <button
+                      className={`at-mechanic-stat ${isActive ? "is-active" : ""}`}
+                      key={status}
+                      aria-pressed={isActive}
+                      onClick={() =>
+                        setStatusFilter(isActive ? "" : status)
+                      }
+                    >
+                      <span className="at-mechanic-stat-label">
+                        {labels[status as keyof typeof labels]}
+                      </span>
+                      <strong className="at-mechanic-stat-value">
+                        {count}
+                      </strong>
+                      <span className="at-mechanic-stat-hint">
+                        {isActive ? "Filtro activo ✕" : "Filtrar vehículos →"}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             )}
             {page === "Mi jornada" && <WorkflowGuide />}

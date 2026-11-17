@@ -16,12 +16,15 @@ export default function WorkflowGuide({
         "Espera la aprobación",
         "Repara y registra pruebas",
       ];
+
   return (
-    <div className="workflow-guide" aria-label="Etapas del trabajo">
+    <div className="at-workflow-stepper" aria-label="Etapas del trabajo">
       {steps.map((step, i) => (
-        <div key={step}>
-          <span>{String(i + 1).padStart(2, "0")}</span>
-          <strong>{step}</strong>
+        <div className="at-workflow-step" key={step}>
+          <span className="at-workflow-step-num">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <strong className="at-workflow-step-title">{step}</strong>
         </div>
       ))}
     </div>

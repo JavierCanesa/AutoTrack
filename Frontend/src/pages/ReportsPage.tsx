@@ -5,6 +5,9 @@ import {
   type Report,
   type Status,
 } from "../services/workshopService";
+import { CardGridSkeleton, TableSkeleton } from "../components/Skeleton";
+import EmptyState from "../components/EmptyState";
+
 export default function ReportsPage({
   mechanicsOnly,
   onNavigate,
@@ -24,6 +27,7 @@ export default function ReportsPage({
   const [data, setData] = useState<Report | null>(null);
   const [error, setError] = useState("");
   const [reload, setReload] = useState(0);
+
   useEffect(() => {
     let active = true;
     setData(null);
@@ -39,14 +43,38 @@ export default function ReportsPage({
       active = false;
     };
   }, [reload]);
+
   if (error)
     return (
       <article className="ws-panel">
-        <p role="alert">{error}</p>
-        <button onClick={() => setReload((n) => n + 1)}>Reintentar</button>
+        <EmptyState
+          title="No se pudo cargar el resumen"
+          description={error}
+          action={
+            <button
+              className="ws-primary"
+              onClick={() => setReload((n) => n + 1)}
+            >
+              Reintentar
+            </button>
+          }
+        />
       </article>
     );
-  if (!data) return <p role="status">Cargando resumen…</p>;
+
+  if (!data)
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <CardGridSkeleton count={4} />
+        <TableSkeleton rows={4} columns={3} />
+      </div>
+    );
+
+  const maxMechanicLoad = Math.max(
+    1,
+    ...data.by_mechanic.map((m) => m.active_orders || 0),
+  );
+
   return (
     <>
       {!mechanicsOnly && (
@@ -67,6 +95,7 @@ export default function ReportsPage({
               Revisar cotizaciones <span aria-hidden="true">↗</span>
             </button>
           </div>
+
           <div className="ws-stats">
             {[
               ["Vehículos", data.total_vehicles],
@@ -95,17 +124,31 @@ export default function ReportsPage({
               </button>
             ))}
           </div>
+
           <div className="report-strip">
-            <span>
+            <button
+              type="button"
+              className="at-report-pill"
+              onClick={() => onNavigate("Cotizaciones")}
+            >
               <strong>{data.pending_quotes}</strong> cotizaciones pendientes
-            </span>
-            <span>
+            </button>
+            <button
+              type="button"
+              className="at-report-pill"
+              onClick={() => onNavigate("Órdenes de trabajo", { active: true })}
+            >
               <strong>{data.unassigned_orders}</strong> órdenes sin asignar
-            </span>
-            <span>
+            </button>
+            <button
+              type="button"
+              className="at-report-pill"
+              onClick={() => onNavigate("Órdenes de trabajo")}
+            >
               <strong>{data.total_orders}</strong> órdenes registradas
-            </span>
+            </button>
           </div>
+
           <div className="analytics-grid">
             <article className="ws-panel">
               <div className="panel-heading">
@@ -114,33 +157,31 @@ export default function ReportsPage({
                 <p>Estados registrados en el sistema</p>
               </div>
               <div className="status-chart">
-                {Object.entries(labels)
-                  .map(([status, label]) => {
-                    const count = data.by_status[status as Status] || 0;
-                    const maximum = Math.max(
-                      1,
-                      ...Object.values(data.by_status).map((v) => v || 0),
-                    );
-                    return (
-                      <button
-                        className="chart-row"
-                        key={status}
-                        onClick={() =>
-                          onNavigate("Órdenes de trabajo", { status })
-                        }
-                      >
-                        <span>{label}</span>
-                        <div className="chart-track">
-                          <div
-                            style={{ width: `${(count / maximum) * 100}%` }}
-                          />
-                        </div>
-                        <strong>{count}</strong>
-                      </button>
-                    );
-                  })}
+                {Object.entries(labels).map(([status, label]) => {
+                  const count = data.by_status[status as Status] || 0;
+                  const maximum = Math.max(
+                    1,
+                    ...Object.values(data.by_status).map((v) => v || 0),
+                  );
+                  return (
+                    <button
+                      className="chart-row"
+                      key={status}
+                      onClick={() =>
+                        onNavigate("Órdenes de trabajo", { status })
+                      }
+                    >
+                      <span>{label}</span>
+                      <div className="chart-track">
+                        <div style={{ width: `${(count / maximum) * 100}%` }} />
+                      </div>
+                      <strong>{count}</strong>
+                    </button>
+                  );
+                })}
               </div>
             </article>
+
             <article className="ws-panel">
               <div className="panel-heading">
                 <p className="ws-overline">VEHÍCULOS PRESENTES</p>
@@ -160,36 +201,76 @@ export default function ReportsPage({
                   </button>
                 ))
               ) : (
-                <p className="ws-empty">No hay vehículos en el taller.</p>
+                <EmptyState
+                  title="Sin vehículos presentes"
+                  description="No hay vehículos activos en el taller en este momento."
+                />
               )}
             </article>
           </div>
         </>
       )}
+
       <article className="ws-panel ws-progress">
-        <h2>Carga por mecánico</h2>
-        {data.by_mechanic.length === 0 && <p>No hay mecánicos registrados.</p>}
-        {data.by_mechanic.map((person) => (
-          <button
-            className="ws-part mechanic-link"
-            key={person.id}
-            onClick={() =>
-              onNavigate("Órdenes de trabajo", {
-                mechanic: person.id,
-                active: true,
-              })
-            }
-          >
-            <span>
-              {person.first_name} {person.last_name}
-            </span>
-            <strong>{person.active_orders} activas</strong>
-          </button>
-        ))}
+        <div className="panel-heading">
+          <p className="ws-overline">EQUIPO TÉCNICO</p>
+          <h2>Carga por mecánico</h2>
+        </div>
+        {data.by_mechanic.length === 0 ? (
+          <EmptyState
+            title="Sin mecánicos registrados"
+            description="Registra mecánicos en el sistema para asignarles órdenes de trabajo."
+          />
+        ) : (
+          <div className="at-mechanic-list">
+            {data.by_mechanic.map((person) => {
+              const initials =
+                `${person.first_name?.[0] || ""}${person.last_name?.[0] || ""}`.toUpperCase() ||
+                "M";
+              const pct = Math.round(
+                ((person.active_orders || 0) / maxMechanicLoad) * 100,
+              );
+              return (
+                <button
+                  className="at-mechanic-row"
+                  key={person.id}
+                  onClick={() =>
+                    onNavigate("Órdenes de trabajo", {
+                      mechanic: person.id,
+                      active: true,
+                    })
+                  }
+                >
+                  <span className="at-mechanic-avatar" aria-hidden="true">
+                    {initials}
+                  </span>
+                  <span className="at-mechanic-name">
+                    {person.first_name} {person.last_name}
+                  </span>
+                  <div className="at-mechanic-bar" aria-hidden="true">
+                    <div
+                      className="at-mechanic-bar-fill"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <strong className="at-mechanic-count">
+                    {person.active_orders} activas
+                  </strong>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </article>
-      <button className="ws-secondary" onClick={() => setReload((n) => n + 1)}>
-        Actualizar
-      </button>
+
+      <div className="at-panel-footer">
+        <button
+          className="ws-secondary"
+          onClick={() => setReload((n) => n + 1)}
+        >
+          Actualizar
+        </button>
+      </div>
     </>
   );
 }

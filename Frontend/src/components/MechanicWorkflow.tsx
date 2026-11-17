@@ -1,4 +1,4 @@
-import { useEffect, useState, type SubmitEvent } from "react";
+﻿import { useEffect, useState, type SubmitEvent } from "react";
 import {
   api,
   labels,
@@ -11,6 +11,7 @@ import {
   type ServiceType,
 } from "../services/serviceTypeService";
 import Evidence from "./Evidence";
+import FileDropzone from "./FileDropzone";
 import { optionalText, requiredText } from "../validation";
 
 type Quote = {
@@ -93,8 +94,15 @@ export default function MechanicWorkflow({
           throw new Error(
             "No se encontró el avance del diagnóstico. Vuelve a abrir la orden.",
           );
-        if (!file?.size || file.size > 5 * 1024 * 1024)
-          throw new Error("Selecciona una imagen de hasta 5 MB.");
+        if (!file?.size) throw new Error("Selecciona una fotografía.");
+        if (file.size > 30 * 1024 * 1024)
+          throw new Error("La fotografía original debe pesar como máximo 30 MB.");
+        setNotice(
+          file.size > 5 * 1024 * 1024 ||
+            !["image/jpeg", "image/png", "image/webp"].includes(file.type)
+            ? "Optimizando y subiendo la fotografía…"
+            : "Subiendo la fotografía…",
+        );
         await uploadPhoto(detail.id, update.id, file);
       } else {
         const payload =
@@ -137,7 +145,7 @@ export default function MechanicWorkflow({
           {error}
         </p>
       )}
-      {notice && <p role="status">{notice}</p>}
+      {notice && <div className="at-notice-banner" role="status">{notice}</div>}
       {detail.status === "RECEIVED" && (
         <form
           className="ws-panel ws-progress"
@@ -217,17 +225,16 @@ export default function MechanicWorkflow({
               ))}
             </div>
             <fieldset disabled={busy}>
-              <label>
-                Foto de las fallas
-                <input
-                  name="photo"
-                  type="file"
-                  required
-                  accept="image/jpeg,image/png,image/webp"
-                />
-              </label>
-              <small>JPEG, PNG o WebP, hasta 5 MB.</small>
-              <button className="ws-primary">Adjuntar fotografía</button>
+              <FileDropzone
+                name="photo"
+                required
+                disabled={busy}
+                title="Elige la fotografía de la falla o arrástrala aquí"
+                hint="JPEG, PNG, WebP o HEIC. Las fotos grandes se optimizan automáticamente antes de subirlas."
+              />
+              <button className="ws-primary" disabled={busy}>
+                {busy ? "Subiendo fotografía…" : "Adjuntar fotografía"}
+              </button>
             </fieldset>
           </form>
           <form

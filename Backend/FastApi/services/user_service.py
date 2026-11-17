@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 import httpx
 from fastapi import Depends, HTTPException
 
-from FastApi.db.config import get_settings
+from FastApi.db.access import privileged_client
 from FastApi.dependencies import require_admin
 from FastApi.schemas.auth import AuthUser
 from FastApi.schemas.user import UserCreate, UserProfileInput, UserView
@@ -14,17 +14,9 @@ from FastApi.services.auth_service import request
 
 
 def admin_client(actor: AuthUser = Depends(require_admin)):
-    settings = get_settings()
-    if not settings.supabase_secret_key:
-        raise HTTPException(503, "Configura SUPABASE_SECRET_KEY solo en Backend/.env para gestionar usuarios.")
-    key = settings.supabase_secret_key.get_secret_value()
-    headers = {"apikey": key}
-    # Las claves service_role antiguas son JWT; las nuevas sb_secret_ van en apikey.
-    if not key.startswith("sb_secret_"):
-        headers["Authorization"] = f"Bearer {key}"
-    with httpx.Client(base_url=str(settings.supabase_url).rstrip("/"), headers=headers, timeout=15) as client:
-        # La autorización ya fue validada con el token real antes de usar esta clave.
+    with privileged_client() as client:
         yield client
+
 
 
 def checked(client, method, path, **kwargs):

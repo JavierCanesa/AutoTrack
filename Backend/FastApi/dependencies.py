@@ -1,4 +1,4 @@
-import httpx
+from typing import Any
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -10,7 +10,8 @@ bearer = HTTPBearer(auto_error=False)
 
 
 def current_user(credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
-                 client: httpx.Client = Depends(auth_client)) -> AuthUser:
+                 client: Any = Depends(auth_client)) -> AuthUser:
+
     if credentials is None:
         raise HTTPException(401, "Inicia sesión para continuar.", headers={"WWW-Authenticate": "Bearer"})
     return get_user(client, credentials.credentials)

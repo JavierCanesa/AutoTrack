@@ -4,5 +4,7 @@ import './style.css';
 import './styles/auth.css';
 import './styles/dashboard.css';
 import './styles/autotrack-theme.css';
+import './styles/modal.css';
+import './styles/ui-feedback.css';
 
 createRoot(document.getElementById('root')!).render(<App />);

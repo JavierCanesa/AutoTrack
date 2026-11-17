@@ -1,6 +1,9 @@
 import { people } from "../services/workshopService";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useEffect, useState, type SubmitEvent } from "react";
+import Modal from "../components/Modal";
+import { TableSkeleton } from "../components/Skeleton";
+import EmptyState from "../components/EmptyState";
+import { useEffect, useState, type FormEvent } from "react";
 import {
   createUser,
   deleteUser,
@@ -21,6 +24,12 @@ const empty: UserInput = {
   password: "",
 };
 
+const roleLabels: Record<string, string> = {
+  ADMIN: "Administrador",
+  MECHANIC: "Mecánico",
+  CLIENT: "Cliente",
+};
+
 export default function UsersPage({
   token,
   currentUserId,
@@ -37,6 +46,8 @@ export default function UsersPage({
   const [input, setInput] = useState<UserInput>(empty);
   const [deleting, setDeleting] = useState<ManagedUser | null>(null);
   const [reload, setReload] = useState(0);
+  const [query, setQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -74,7 +85,10 @@ export default function UsersPage({
             email: user.email || "",
             password: "",
           }
-        : { ...empty },
+        : {
+            ...empty,
+            role: (initialRole as UserInput["role"]) || "CLIENT",
+          },
     );
     setShowForm(true);
     setDeleting(null);
@@ -82,7 +96,7 @@ export default function UsersPage({
     setNotice("");
   }
 
-  async function save(event: SubmitEvent<HTMLFormElement>) {
+  async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
     setBusy(true);
@@ -102,7 +116,7 @@ export default function UsersPage({
       setInput({ ...empty });
       setNotice(
         editing
-          ? "Perfil actualizado."
+          ? "Perfil actualizado con éxito."
           : "Cuenta creada. El UUID de Auth y del perfil es el mismo.",
       );
       setReload((value) => value + 1);
@@ -132,14 +146,29 @@ export default function UsersPage({
     }
   }
 
+  const filtered = users.filter((u) => {
+    const matchesRole = !roleFilter || u.role === roleFilter;
+    const matchesQuery =
+      `${u.first_name} ${u.last_name} ${u.email || ""} ${u.id}`
+        .toLowerCase()
+        .includes(query.toLowerCase());
+    return matchesRole && matchesQuery;
+  });
+
+  const hasFilters = !!(query || roleFilter);
+  const isMechanicsView = initialRole === "MECHANIC";
+
   return (
     <article className="ws-panel">
       <div className="ws-panel-title">
         <div>
-          <h2>Usuarios del sistema</h2>
+          <h2>
+            {isMechanicsView ? "Mecánicos del taller" : "Usuarios del sistema"}
+          </h2>
           <p>
-            Datos reales de Supabase. Crea la cuenta una sola vez; su perfil usa
-            el mismo ID.
+            {isMechanicsView
+              ? "Personal técnico registrado para diagnóstico y reparación de órdenes."
+              : "Datos reales de Supabase. Crea la cuenta una sola vez; su perfil usa el mismo ID."}
           </p>
         </div>
         <button
@@ -147,128 +176,214 @@ export default function UsersPage({
           disabled={busy}
           onClick={() => openForm(null)}
         >
-          Crear usuario
+          {isMechanicsView ? "Registrar mecánico" : "Crear usuario"}
         </button>
       </div>
-      {error && <p role="alert">{error}</p>}
-      {notice && <p role="status">{notice}</p>}
-      {showForm && (
-        <form className="ws-progress" onSubmit={save}>
-          <h3>{editing ? "Editar perfil" : "Crear cuenta y perfil"}</h3>
-          {editing && (
-            <p>
-              ID: {editing.id}
-              <br />
-              Correo: {editing.email}. El correo y la contraseña se gestionan en
-              Authentication.
-            </p>
-          )}
-          <fieldset disabled={busy}>
-            <label>
-              Nombre
-              <input
-                required
-                pattern={PERSON_NAME_PATTERN}
-                title="Usa letras, espacios, puntos, apóstrofes o guiones."
-                maxLength={100}
-                value={input.first_name}
-                onChange={(e) =>
-                  setInput({ ...input, first_name: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Apellido
-              <input
-                required
-                pattern={PERSON_NAME_PATTERN}
-                title="Usa letras, espacios, puntos, apóstrofes o guiones."
-                maxLength={100}
-                value={input.last_name}
-                onChange={(e) =>
-                  setInput({ ...input, last_name: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Teléfono
-              <input
-                type="tel"
-                pattern={PHONE_PATTERN}
-                title="Escribe de 8 a 15 dígitos; puedes usar espacios, paréntesis, guiones o un + inicial."
-                maxLength={30}
-                value={input.phone || ""}
-                onChange={(e) => setInput({ ...input, phone: e.target.value })}
-              />
-            </label>
-            <label>
-              Rol
-              <select
-                value={input.role}
-                disabled={editing?.role === "ADMIN"}
-                onChange={(e) =>
-                  setInput({
-                    ...input,
-                    role: e.target.value as UserInput["role"],
-                  })
-                }
-              >
-                <option value="CLIENT">Cliente</option>
-                <option value="MECHANIC">Mecánico</option>
-                <option value="ADMIN">Administrador</option>
-              </select>
-            </label>
-            {!editing && (
-              <>
-                <label>
-                  Correo
-                  <input
-                    required
-                    type="email"
-                    maxLength={254}
-                    autoComplete="off"
-                    value={input.email}
-                    onChange={(e) =>
-                      setInput({ ...input, email: e.target.value })
-                    }
-                  />
-                </label>
-                <label>
-                  Contraseña inicial
-                  <input
-                    required
-                    type="password"
-                    minLength={8}
-                    maxLength={4096}
-                    autoComplete="new-password"
-                    value={input.password}
-                    onChange={(e) =>
-                      setInput({ ...input, password: e.target.value })
-                    }
-                  />
-                </label>
-                <p>
-                  Cuenta creada por el administrador con el correo confirmado.
-                  La contraseña se envía solo a Auth.
-                </p>
-              </>
-            )}
-            <button className="ws-primary" type="submit">
-              {busy ? "Guardando…" : "Guardar"}
-            </button>{" "}
-            <button
-              className="ws-secondary"
-              type="button"
-              onClick={() => {
-                setShowForm(false);
-                setInput({ ...empty });
-              }}
-            >
-              Cancelar
-            </button>
-          </fieldset>
-        </form>
+
+      {error && !showForm && (
+        <p role="alert" className="error">
+          {error}
+        </p>
       )}
+      {notice && (
+        <div className="at-notice-banner" role="status">
+          {notice}
+        </div>
+      )}
+
+      {/* Modal Reutilizable para Crear / Editar Usuario */}
+      <Modal
+        isOpen={showForm}
+        onClose={() => {
+          if (!busy) {
+            setShowForm(false);
+            setInput({ ...empty });
+            setError("");
+          }
+        }}
+        title={editing ? "Editar perfil" : "Crear nuevo usuario"}
+        subtitle={
+          editing ? (
+            <>
+              <div>
+                ID: <code>{editing.id}</code>
+              </div>
+              <div>
+                Correo: <strong>{editing.email}</strong>. El correo y la
+                contraseña se gestionan en Authentication.
+              </div>
+            </>
+          ) : (
+            "Registra un nuevo usuario para otorgarle acceso a AutoTrack."
+          )
+        }
+        icon={
+          editing ? (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+          ) : (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="8.5" cy="7" r="4" />
+              <line x1="20" y1="8" x2="20" y2="14" />
+              <line x1="23" y1="11" x2="17" y2="11" />
+            </svg>
+          )
+        }
+        onSubmit={save}
+        primaryLabel={editing ? "Guardar" : "Crear usuario"}
+        secondaryLabel="Cancelar"
+        busy={busy}
+        error={error}
+      >
+        <div className="at-modal-grid-2">
+          <div className="at-form-field">
+            <label className="at-form-label" htmlFor="user-first-name">
+              Nombre <span className="at-required-star">*</span>
+            </label>
+            <input
+              id="user-first-name"
+              className="at-form-input"
+              required
+              pattern={PERSON_NAME_PATTERN}
+              title="Usa letras, espacios, puntos, apóstrofes o guiones."
+              maxLength={100}
+              placeholder="Ej. Juan"
+              value={input.first_name}
+              onChange={(e) =>
+                setInput({ ...input, first_name: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="at-form-field">
+            <label className="at-form-label" htmlFor="user-last-name">
+              Apellido <span className="at-required-star">*</span>
+            </label>
+            <input
+              id="user-last-name"
+              className="at-form-input"
+              required
+              pattern={PERSON_NAME_PATTERN}
+              title="Usa letras, espacios, puntos, apóstrofes o guiones."
+              maxLength={100}
+              placeholder="Ej. Pérez"
+              value={input.last_name}
+              onChange={(e) =>
+                setInput({ ...input, last_name: e.target.value })
+              }
+            />
+          </div>
+        </div>
+
+        <div className="at-modal-grid-2">
+          <div className="at-form-field">
+            <label className="at-form-label" htmlFor="user-phone">
+              Teléfono
+            </label>
+            <input
+              id="user-phone"
+              className="at-form-input"
+              type="tel"
+              pattern={PHONE_PATTERN}
+              title="Escribe de 8 a 15 dígitos; puedes usar espacios, paréntesis, guiones o un + inicial."
+              maxLength={30}
+              placeholder="Ej. +502 1234 5678"
+              value={input.phone || ""}
+              onChange={(e) => setInput({ ...input, phone: e.target.value })}
+            />
+          </div>
+
+          <div className="at-form-field">
+            <label className="at-form-label" htmlFor="user-role">
+              Rol
+            </label>
+            <select
+              id="user-role"
+              className="at-form-select"
+              value={input.role}
+              disabled={editing?.role === "ADMIN"}
+              onChange={(e) =>
+                setInput({
+                  ...input,
+                  role: e.target.value as UserInput["role"],
+                })
+              }
+            >
+              <option value="CLIENT">Cliente</option>
+              <option value="MECHANIC">Mecánico</option>
+              <option value="ADMIN">Administrador</option>
+            </select>
+          </div>
+        </div>
+
+        {!editing && (
+          <>
+            <div className="at-modal-grid-2">
+              <div className="at-form-field">
+                <label className="at-form-label" htmlFor="user-email">
+                  Correo <span className="at-required-star">*</span>
+                </label>
+                <input
+                  id="user-email"
+                  className="at-form-input"
+                  required
+                  type="email"
+                  maxLength={254}
+                  autoComplete="off"
+                  placeholder="usuario@ejemplo.com"
+                  value={input.email}
+                  onChange={(e) =>
+                    setInput({ ...input, email: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="at-form-field">
+                <label className="at-form-label" htmlFor="user-password">
+                  Contraseña inicial <span className="at-required-star">*</span>
+                </label>
+                <input
+                  id="user-password"
+                  className="at-form-input"
+                  required
+                  type="password"
+                  minLength={8}
+                  maxLength={4096}
+                  autoComplete="new-password"
+                  placeholder="Mínimo 8 caracteres"
+                  value={input.password}
+                  onChange={(e) =>
+                    setInput({ ...input, password: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="at-modal-info-box">
+              Cuenta creada por el administrador con el correo confirmado. La
+              contraseña se envía solo a Auth.
+            </div>
+          </>
+        )}
+      </Modal>
+
       {deleting && (
         <ConfirmDialog
           busy={busy}
@@ -282,93 +397,242 @@ export default function UsersPage({
           {error && <p role="alert">{error}</p>}
         </ConfirmDialog>
       )}
+
+      <div className="ws-filters">
+        <label>
+          {isMechanicsView ? "Buscar mecánico" : "Buscar usuario"}
+          <div className="at-search-wrap">
+            <span className="at-search-icon" aria-hidden="true">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </span>
+            <input
+              type="search"
+              className="at-search-input"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Nombre, apellido, correo o ID…"
+            />
+            {query && (
+              <button
+                type="button"
+                className="at-search-clear"
+                aria-label="Limpiar búsqueda"
+                onClick={() => setQuery("")}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </label>
+        {!loading && (
+          <span className="at-filter-count">
+            {filtered.length} de {users.length}{" "}
+            {isMechanicsView ? "mecánicos" : "usuarios"}
+          </span>
+        )}
+      </div>
+
+      {!initialRole && !loading && users.length > 0 && (
+        <div
+          className="at-status-chips"
+          role="group"
+          aria-label="Filtrar por rol"
+        >
+          <button
+            type="button"
+            className={`at-chip ${roleFilter === "" ? "is-active" : ""}`}
+            onClick={() => setRoleFilter("")}
+          >
+            Todos <span className="at-chip-count">{users.length}</span>
+          </button>
+          {(
+            [
+              ["ADMIN", "Administradores"],
+              ["MECHANIC", "Mecánicos"],
+              ["CLIENT", "Clientes"],
+            ] as const
+          ).map(([key, label]) => {
+            const count = users.filter((u) => u.role === key).length;
+            if (!count && roleFilter !== key) return null;
+            return (
+              <button
+                key={key}
+                type="button"
+                className={`at-chip ${roleFilter === key ? "is-active" : ""}`}
+                onClick={() => setRoleFilter(roleFilter === key ? "" : key)}
+              >
+                {label} <span className="at-chip-count">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {loading ? (
-        <p role="status">Cargando usuarios…</p>
+        <TableSkeleton rows={5} columns={4} />
       ) : (
         <>
-          <div className="ws-table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nombre / Correo</th>
-                  <th>Rol</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <strong>
-                        {user.first_name} {user.last_name}
-                      </strong>
-                      <small>{user.email || "Correo no disponible"}</small>
-                      <small>{user.id}</small>
-                    </td>
-                    <td>{user.role || "Sin perfil"}</td>
-                    <td>
-                      {user.deleted
-                        ? "Eliminado"
-                        : !user.profile_exists
-                          ? "Falta perfil"
-                          : !user.email_confirmed
-                            ? "Correo sin confirmar"
-                            : "Activo"}
-                    </td>
-                    <td>
-                      <button
-                        className="ws-text-button"
-                        disabled={user.deleted || busy}
-                        onClick={() => openForm(user)}
-                      >
-                        Editar
-                      </button>{" "}
-                      <button
-                        className="ws-text-button"
-                        disabled={
-                          user.deleted ||
-                          user.id === currentUserId ||
-                          user.role === "ADMIN" ||
-                          busy
-                        }
-                        onClick={() => {
-                          setDeleting(user);
-                          setShowForm(false);
-                          setError("");
-                        }}
-                      >
-                        Eliminar
-                      </button>
-                    </td>
+          {filtered.length === 0 ? (
+            <EmptyState
+              title={
+                hasFilters
+                  ? "Sin coincidencias"
+                  : isMechanicsView
+                    ? "No hay mecánicos registrados"
+                    : "No hay usuarios en esta página"
+              }
+              description={
+                hasFilters
+                  ? "Prueba ajustando tu búsqueda o quitando el filtro de rol."
+                  : "Crea una nueva cuenta o cambia de página para ver otros registros."
+              }
+              action={
+                hasFilters ? (
+                  <button
+                    className="ws-secondary"
+                    onClick={() => {
+                      setQuery("");
+                      setRoleFilter("");
+                    }}
+                  >
+                    Limpiar filtros
+                  </button>
+                ) : (
+                  <button
+                    className="ws-primary"
+                    disabled={busy}
+                    onClick={() => openForm(null)}
+                  >
+                    {isMechanicsView ? "Registrar mecánico" : "Crear usuario"}
+                  </button>
+                )
+              }
+            />
+          ) : (
+            <div className="ws-table-wrap">
+              <table className="orders-table">
+                <thead>
+                  <tr>
+                    <th>Nombre / Correo</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filtered.map((user) => {
+                    const statusText = user.deleted
+                      ? "Eliminado"
+                      : !user.profile_exists
+                        ? "Falta perfil"
+                        : !user.email_confirmed
+                          ? "Sin confirmar"
+                          : "Activo";
+                    const statusClass = user.deleted
+                      ? "ws-cancelled"
+                      : !user.profile_exists || !user.email_confirmed
+                        ? "ws-waiting_approval"
+                        : "ws-completed";
+                    return (
+                      <tr key={user.id}>
+                        <td>
+                          <strong>
+                            {user.first_name} {user.last_name}
+                          </strong>
+                          <small>{user.email || "Correo no disponible"}</small>
+                          <small>{user.id}</small>
+                        </td>
+                        <td>
+                          <span
+                            className={`at-role-pill ${
+                              user.role === "ADMIN"
+                                ? "is-admin"
+                                : user.role === "MECHANIC"
+                                  ? "is-mechanic"
+                                  : ""
+                            }`}
+                          >
+                            {roleLabels[user.role || ""] ||
+                              user.role ||
+                              "Sin perfil"}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`ws-badge ${statusClass}`}>
+                            {statusText}
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            className="at-table-action-btn"
+                            disabled={user.deleted || busy}
+                            onClick={() => openForm(user)}
+                          >
+                            Editar
+                          </button>{" "}
+                          <button
+                            className="ws-text-button"
+                            disabled={
+                              user.deleted ||
+                              user.id === currentUserId ||
+                              user.role === "ADMIN" ||
+                              busy
+                            }
+                            onClick={() => {
+                              setDeleting(user);
+                              setShowForm(false);
+                              setError("");
+                            }}
+                          >
+                            Eliminar
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div className="at-pagination">
+            <div className="at-pagination-controls">
+              <button
+                className="ws-secondary"
+                disabled={!!initialRole || page === 1 || busy}
+                onClick={() => setPage((value) => value - 1)}
+              >
+                Anterior
+              </button>
+              <span className="at-page-indicator">Página {page}</span>
+              <button
+                className="ws-secondary"
+                disabled={!!initialRole || users.length < 20 || busy}
+                onClick={() => setPage((value) => value + 1)}
+              >
+                Siguiente
+              </button>
+            </div>
+            <button
+              className="ws-secondary"
+              disabled={busy}
+              onClick={() => setReload((value) => value + 1)}
+            >
+              Actualizar lista
+            </button>
           </div>
-          {users.length === 0 && <p>No hay usuarios en esta página.</p>}
-          <button
-            className="ws-secondary"
-            disabled={!!initialRole || page === 1 || busy}
-            onClick={() => setPage((value) => value - 1)}
-          >
-            Anterior
-          </button>{" "}
-          <span>Página {page}</span>{" "}
-          <button
-            className="ws-secondary"
-            disabled={!!initialRole || users.length < 20 || busy}
-            onClick={() => setPage((value) => value + 1)}
-          >
-            Siguiente
-          </button>{" "}
-          <button
-            className="ws-secondary"
-            disabled={busy}
-            onClick={() => setReload((value) => value + 1)}
-          >
-            Actualizar lista
-          </button>
         </>
       )}
     </article>

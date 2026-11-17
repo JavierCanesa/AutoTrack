@@ -1,0 +1,417 @@
+/* ==========================================================================
+   AutoTrack - Reusable Modern Modal Component Styles
+   Inspirado en el diseño moderno: dark/elevated surface, squircle icon badge,
+   grid responsive, focus states refinados y microinteracciones fluidas.
+   ========================================================================== */
+
+/* Diálogo base y backdrop */
+.at-modal-dialog {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f4f4f5;
+  max-width: min(640px, calc(100vw - 32px));
+  width: 100%;
+  margin: auto;
+  overflow: visible;
+}
+
+.at-modal-dialog::backdrop {
+  background: rgba(15, 8, 12, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: at-modal-fade-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Animaciones de entrada */
+@keyframes at-modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes at-modal-scale-up {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Tarjeta principal del modal */
+.at-modal-card {
+  position: relative;
+  background: #1c1a1e;
+  background: linear-gradient(180deg, #221e24 0%, #1a171c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  box-shadow:
+    0 20px 45px -10px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+  animation: at-modal-scale-up 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Formulario contenedor */
+.at-modal-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
+}
+
+/* Cabecera del modal */
+.at-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.at-modal-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Icono en badge squircle */
+.at-modal-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.at-modal-icon-badge svg {
+  width: 22px;
+  height: 22px;
+}
+
+.at-modal-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.at-modal-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.at-modal-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #9d9499;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.at-modal-subtitle code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #e4d7dc;
+}
+
+/* Botón cerrar rápido '✕' */
+.at-modal-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #8f858a;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.at-modal-close-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.at-modal-close-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Cuerpo del modal (Scrollable) */
+.at-modal-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.at-modal-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Soporte para etiquetas y controles estándar dentro del modal */
+.at-modal-body label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2d9dd;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  text-align: left;
+}
+
+.at-modal-body p {
+  color: #b0a6ab;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Grid responsivo: 2 columnas en desktop, 1 en mobile */
+.at-modal-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 580px) {
+  .at-modal-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+/* Campos del formulario */
+.at-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  text-align: left;
+}
+
+.at-form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2d9dd;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.at-required-star {
+  color: #e5484d;
+  font-weight: 700;
+}
+
+/* Inputs, Selects y Textareas modernos */
+.at-modal-body input:not([type="checkbox"]):not([type="radio"]),
+.at-modal-body select,
+.at-modal-body textarea,
+.at-form-input,
+.at-form-select,
+.at-form-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #141216 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 10px !important;
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+
+.at-modal-body input::placeholder,
+.at-modal-body textarea::placeholder,
+.at-form-input::placeholder,
+.at-form-textarea::placeholder {
+  color: #6d6368 !important;
+}
+
+.at-modal-body input:hover:not(:disabled),
+.at-modal-body select:hover:not(:disabled),
+.at-modal-body textarea:hover:not(:disabled),
+.at-form-input:hover:not(:disabled),
+.at-form-select:hover:not(:disabled),
+.at-form-textarea:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: #17151a !important;
+}
+
+.at-modal-body input:focus,
+.at-modal-body select:focus,
+.at-modal-body textarea:focus,
+.at-form-input:focus,
+.at-form-select:focus,
+.at-form-textarea:focus {
+  outline: none !important;
+  border-color: #b84853 !important;
+  box-shadow: 0 0 0 3px rgba(184, 72, 83, 0.25) !important;
+  background: #18151b !important;
+}
+
+.at-modal-body input:disabled,
+.at-modal-body select:disabled,
+.at-modal-body textarea:disabled,
+.at-form-input:disabled,
+.at-form-select:disabled,
+.at-form-textarea:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  background: #110f13 !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Pie del modal (Footer) */
+.at-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 28px 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.at-modal-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.at-modal-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Botones del modal */
+.at-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Botón secundario / Cancelar (Ghost / Outline sutil) */
+.at-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1c7cc;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.at-btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.at-btn-secondary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Botón primario / Guardar (Vino institucional AutoTrack con elevación) */
+.at-btn-primary {
+  background: linear-gradient(135deg, #a53644 0%, #7e1227 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 14px rgba(126, 18, 39, 0.4);
+}
+
+.at-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b84853 0%, #912436 100%);
+  box-shadow: 0 6px 20px rgba(165, 54, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+.at-btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.at-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Alertas de error dentro del modal */
+.at-modal-alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.at-modal-alert-error {
+  background: rgba(184, 72, 83, 0.18);
+  border: 1px solid rgba(184, 72, 83, 0.38);
+  color: #fca5a5;
+}
+
+.at-modal-info-box {
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #b0a6ab;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* Spinner sutil para estado cargando */
+.at-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: at-spin 0.65s linear infinite;
+}
+
+@keyframes at-spin {
+  to { transform: rotate(360deg); }
+}
